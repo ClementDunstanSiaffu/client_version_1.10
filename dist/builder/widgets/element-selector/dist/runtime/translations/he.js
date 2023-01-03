@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({pendingElementsInfo:"באזור זה מפורטים הווידג'טים שהוגדרו אך לא על לוח הציור הנוכחי. ייתכן שהם קיימים במצבי התקן אחרים.",element:"הוסף ווידג'ט",new:"חדש",pending:"ממתין",widgetHelpIconLabel:"אודות הווידג'ט",widgetGuideStart:"סיור"})}}}));

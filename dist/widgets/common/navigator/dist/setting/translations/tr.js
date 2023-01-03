@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Gezintiyi Görüntüler",tabStyle:"Stile dokun",navBtnStyle:"Gezinti buton stili",stepTips:"Sadece karşılık gelen Bölüm aracı için bir geçiş animasyonu ayarlanmışsa çalışır."})}}}));

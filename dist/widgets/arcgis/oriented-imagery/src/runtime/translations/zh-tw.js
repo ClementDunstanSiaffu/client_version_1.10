@@ -1,0 +1,1 @@
+System.register([],(function(t){return{execute:function(){t({_widgetLabel:"已定向影像",toggleButtonOn:"關閉以選擇地圖中的圖徵",toggleButtonOff:"開啟可在地圖中選擇焦點以檢視圖片",viewImage:"按一下這裡以檢視圖片中的所選圖徵",updateButton:"更新",deleteButton:"刪除"})}}}));

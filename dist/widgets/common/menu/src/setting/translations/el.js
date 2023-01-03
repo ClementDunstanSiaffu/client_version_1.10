@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({subMenuExpandMode:"Λειτουργία ανάπτυξης υπομενού",mainMenu:"Βασικό μενού",subMenu:"Υπομενού"})}}}));

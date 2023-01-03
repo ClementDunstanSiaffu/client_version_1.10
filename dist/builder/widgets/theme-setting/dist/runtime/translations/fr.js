@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({chooseTheme:"Thème",customTheme:"Personnaliser",resetTheme:"Réinitialiser",backToMainThemePanel:"Retour",customPaletteTitle:"Personnaliser les couleurs de la palette",customFontsetTitle:"Personnaliser le jeu de polices",customAppElementsTitle:"Éléments d’application"})}}}));

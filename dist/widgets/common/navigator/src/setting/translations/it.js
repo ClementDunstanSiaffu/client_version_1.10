@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Navigazione viste",tabStyle:"Stile scheda",navBtnStyle:"Stile pulsante di navigazione",stepTips:"Funziona solo quando è impostata un'animazione di transizione per il widget Sezione corrispondente."})}}}));

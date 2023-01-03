@@ -1,0 +1,1 @@
+System.register([],(function(t){return{execute:function(){t({_widgetLabel:"Орієнтоване зображення",toggleButtonOn:"Вимкнути, щоб обрати об'єкти на карті",toggleButtonOff:"Увімкнути, щоб вибрати точку фокусу на карті для перегляду зображення",viewImage:"Клацніть тут, щоб переглянути обраний об'єкт на зображенні",updateButton:"Оновити",deleteButton:"Видалити"})}}}));

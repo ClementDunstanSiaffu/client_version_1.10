@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({createNew:"Buat baru",newExperience:"Pengalaman baru",experiences:"Pengalaman",templates:"Template",developerEdition:"Edisi Pengembang"})}}}));

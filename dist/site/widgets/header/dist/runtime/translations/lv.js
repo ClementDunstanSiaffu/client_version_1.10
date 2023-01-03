@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({createNew:"Izveidot jaunu",newExperience:"Jauna Experience lietotne",experiences:"Experience lietotnes",templates:"Veidnes",developerEdition:"Developer Edition"})}}}));

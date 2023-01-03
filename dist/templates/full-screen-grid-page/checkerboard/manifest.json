@@ -1,0 +1,16 @@
+{
+  "name": "checkerboard",
+  "type": "template",
+  "templateType": "full-screen-grid-page",
+  "label": "Checkerboard",
+  "description": "Checkerboard is a grid page template with a map widget in the middle and map related widgets around it.",
+  "thumbnail": "thumbnail.png",
+  "order": 2,
+  "isNewTemplate": true,
+  "tags": [
+    "Map centric",
+    "Dashboard"
+  ],
+  "thumbnailWidth": 320,
+  "thumbnailHeight": 214
+}

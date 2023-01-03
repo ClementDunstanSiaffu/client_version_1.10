@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"区切り線",quickStyleItem:"クイック スタイル{index}"})}}}));

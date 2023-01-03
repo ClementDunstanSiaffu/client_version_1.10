@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({chooseTheme:"主題",customTheme:"自訂",resetTheme:"重設",backToMainThemePanel:"上一步",customPaletteTitle:"自訂調色盤顏色",customFontsetTitle:"自訂字型集",customAppElementsTitle:"應用程式元素"})}}}));

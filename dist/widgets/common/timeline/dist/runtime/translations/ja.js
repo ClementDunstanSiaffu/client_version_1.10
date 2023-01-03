@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"タイムライン",overallTimeExtent:"全体の時間範囲",filteringApplied:"適用されているタイムライン フィルタリング",noTlFromHonoredMapWarning:"エラー。 このマップに問題が発生しました。有効な時間設定を取得できません。",invalidTimeSpanWarning:"ウィジェット構成を確認し、期間が有効であることを確認してください。"})}}}));

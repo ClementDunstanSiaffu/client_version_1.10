@@ -1,0 +1,1 @@
+System.register([],(function(n){return{execute:function(){n({subMenuExpandMode:"Chế độ mở rộng menu phụ",mainMenu:"Menu chính",subMenu:"Menu phụ"})}}}));

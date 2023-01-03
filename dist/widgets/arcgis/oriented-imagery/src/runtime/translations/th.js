@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Oriented Imagery",toggleButtonOn:"ปิดเพื่อเลือกฟีเจอร์ในแผนที่",toggleButtonOff:"เปิดเพื่อเลือกจุดโฟกัสในแผนที่เพื่อดูภาพ",viewImage:"คลิกที่นี่เพื่อดูคุณสมบัติที่เลือกในภาพ",updateButton:"อัพเดท",deleteButton:"ลบ"})}}}));

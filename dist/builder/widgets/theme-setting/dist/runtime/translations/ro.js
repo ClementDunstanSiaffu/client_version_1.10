@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({chooseTheme:"Temă",customTheme:"Personalizare",resetTheme:"Resetare",backToMainThemePanel:"Înapoi",customPaletteTitle:"Personalizați culorile de paletă",customFontsetTitle:"Personalizați setul de fonturi",customAppElementsTitle:"Elemente de aplicație"})}}}));

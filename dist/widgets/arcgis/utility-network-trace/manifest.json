@@ -1,0 +1,24 @@
+{
+  "name": "utility-network-trace",
+  "label": "Utility Network Trace (beta)",
+  "type": "widget",
+  "version": "1.10.0",
+  "exbVersion": "1.10.0",
+  "author": "Esri Solutions",
+  "description": "A widget to trace the ArcGIS Utility Network",
+  "copyright": "",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "requireEnterprise": true,
+  "requiredUserTypeExtensions": [
+    "ArcGIS Utility Network"
+  ],
+  "properties": {},
+  "dependency": "jimu-arcgis",
+  "defaultSize": {
+    "width": 300,
+    "height": 550
+  },
+  "translatedLocales": [
+    "en"
+  ]
+}

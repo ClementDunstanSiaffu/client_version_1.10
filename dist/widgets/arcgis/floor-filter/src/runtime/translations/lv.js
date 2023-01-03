@@ -1,0 +1,1 @@
+System.register([],(function(t){return{execute:function(){t({_widgetLabel:"Stāvu filtrs",floorfilter_noMap:"Stāvu filtrs",floorfilter_notFloorAware:"Atlasītajā kartē nav norādes par stāviem"})}}}));

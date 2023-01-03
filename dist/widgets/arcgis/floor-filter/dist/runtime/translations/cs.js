@@ -1,0 +1,1 @@
+System.register([],(function(o){return{execute:function(){o({_widgetLabel:"Filtr podlaží",floorfilter_noMap:"Filtr podlaží",floorfilter_notFloorAware:"Vybraná mapa nemá informace o podlaží"})}}}));

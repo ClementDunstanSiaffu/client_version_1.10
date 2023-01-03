@@ -1,0 +1,1 @@
+System.register([],(function(t){return{execute:function(){t({selectMapWidget:"Valitse kartan pienoisohjelma",routeSettings:"Reittiasetukset",searchSettings:"Hakuasetukset",routeUrl:"Reitin URL-osoite",outputStops:"Pysähdykset",outputRoute:"Reitti",outputDirectionPoints:"Reittiohjeen pisteet",outputDirectionLines:"Reittiohjeen viivat"})}}}));

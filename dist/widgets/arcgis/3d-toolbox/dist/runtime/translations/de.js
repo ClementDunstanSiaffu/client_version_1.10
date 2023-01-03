@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"3D-Toolbox",select3DScene:"Wählen Sie eine 3D-Szene aus, um dieses Widget zu aktivieren",clearEffect:"Effekt löschen",clearAnalysis:"Analyse löschen",showDevelopmentLayer:"Entwicklungslayer anzeigen"})}}}));

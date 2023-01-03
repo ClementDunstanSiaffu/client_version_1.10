@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"3D-verktøykasse",select3DScene:"Velg en 3D-scene for å aktivere dette miniprogrammet",clearEffect:"Fjern effekt",clearAnalysis:"Fjern analyse",showDevelopmentLayer:"Vis utviklingslag"})}}}));

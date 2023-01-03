@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Siatka",widgetProperties:"Właściwości widżetu",widgetFunctions:"Funkcje widżetu",widgetName:"Nazwa widżetu:",widgetProps:"Właściwości widżetu:",tips:"Siatka"})}}}));

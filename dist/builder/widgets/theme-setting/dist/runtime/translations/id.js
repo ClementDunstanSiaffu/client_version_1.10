@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({chooseTheme:"Tema",customTheme:"Kustomisasi",resetTheme:"Atur Ulang",backToMainThemePanel:"Kembali",customPaletteTitle:"Kustomisasi warna palet",customFontsetTitle:"Kustomisasi rangkaian font",customAppElementsTitle:"Elemen aplikasi"})}}}));

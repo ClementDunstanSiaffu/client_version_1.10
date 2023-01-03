@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({createNew:"Loo uus",newExperience:"Uus Experience projekt",experiences:"Experience projektid",templates:"Mallid",developerEdition:"Developer Edition"})}}}));

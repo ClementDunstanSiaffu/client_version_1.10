@@ -1,0 +1,16 @@
+{
+  "name": "gear",
+  "type": "template",
+  "templateType": "app",
+  "label": "Gear",
+  "description": "Gear is a template that features a Section widget that autoplays through four identical structured Views and is appropriate for displaying different content from the same category.",
+  "thumbnail": "thumbnail.png",
+  "order": 18,
+  "tags": [
+    "Web page"
+  ],
+  "isMultiplePage": false,
+  "isMapAware": false,
+  "thumbnailWidth": 320,
+  "thumbnailHeight": 214
+}

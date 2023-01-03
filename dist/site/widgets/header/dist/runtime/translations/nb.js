@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({createNew:"Opprett ny",newExperience:"Ny opplevelse",experiences:"Opplevelser",templates:"Maler",developerEdition:"Developer Edition"})}}}));

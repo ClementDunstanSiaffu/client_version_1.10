@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({createNew:"Créer",newExperience:"Nouvelle expérience",experiences:"Expériences",templates:"Modèles",developerEdition:"Developer Edition"})}}}));

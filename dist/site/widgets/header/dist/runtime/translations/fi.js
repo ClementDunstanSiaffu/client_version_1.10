@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({createNew:"Luo uusi",newExperience:"Uusi kokemus",experiences:"Kokemukset",templates:"Mallit",developerEdition:"Developer Edition"})}}}));

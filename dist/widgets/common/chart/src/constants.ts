@@ -1,0 +1,16 @@
+export const ByFieldSeriesX = 'name'
+export const ByFieldSeriesXAlias = 'Name'
+export const ByFieldSeriesY = 'value'
+export const ByFieldSeriesYAlias = 'Value'
+export const MaxCategories = 99
+export const MaxPieces = 1000
+export const MaxSlices = 300
+export const MaxSeries = 20
+export const MaxColorCount = 20
+export const ObjectIdField = 'objectid'
+export const HistogramMinValueField = 'minValue'
+export const HistogramMinValueFieldAlias = 'Min value'
+export const HistogramMaxValueField = 'maxValue'
+export const HistogramMaxValueFieldAlias = 'Max value'
+export const HistogramCountField = 'count'
+export const HistogramCountFieldAlias = 'Count'

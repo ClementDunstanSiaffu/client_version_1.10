@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"時間軸",overallTimeExtent:"整體時間範圍",filteringApplied:"已套用時間軸篩選",noTlFromHonoredMapWarning:"抱歉! 這張地圖似乎出現問題，我們無法取得任何有效的時間設定。",invalidTimeSpanWarning:"請檢查 widget 配置以確保時間跨度有效。"})}}}));

@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({subMenuExpandMode:"Apakšizvēlnes izvēršanas režīms",mainMenu:"Galvenā izvēlne",subMenu:"Apakšizvēlne"})}}}));

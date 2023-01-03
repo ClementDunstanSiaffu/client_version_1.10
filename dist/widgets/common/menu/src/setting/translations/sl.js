@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({subMenuExpandMode:"Način povečave podmenija",mainMenu:"Glavni meni",subMenu:"Podmeni"})}}}));

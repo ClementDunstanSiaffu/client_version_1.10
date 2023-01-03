@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({chooseTheme:"Θέμα",customTheme:"Εξατομίκευση",resetTheme:"Επαναφορά",backToMainThemePanel:"Πίσω",customPaletteTitle:"Εξατομίκευση χρωμάτων παλέτας",customFontsetTitle:"Εξατομίκευση συνόλου γραμματοσειρών",customAppElementsTitle:"Στοιχεία εφαρμογής"})}}}));

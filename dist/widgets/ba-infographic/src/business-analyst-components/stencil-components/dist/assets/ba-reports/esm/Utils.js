@@ -1,0 +1,1 @@
+var Utils=function(){function t(){}return t.hasText=function(t){return!(null==t)&&"string"==typeof t&&t.length>0&&t.trim().length>0},t.fixId=function(t){return!t||t.length<=0?"":"#"===t[0]?t:"#"+t},t.removeChildren=function(t){for(;t.lastChild;)t.removeChild(t.lastChild)},t}();export default Utils;

@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"뷰 탐색",tabStyle:"탭 스타일",navBtnStyle:"탐색 버튼 스타일",stepTips:"해당 섹션 위젯에 전환 애니메이션이 설정된 경우에만 작동합니다."})}}}));

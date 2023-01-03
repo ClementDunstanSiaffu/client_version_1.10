@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({createNew:"Создать новый",newExperience:"Новый интерфейс",experiences:"Интерфейсы",templates:"Шаблоны",developerEdition:"Developer Edition"})}}}));

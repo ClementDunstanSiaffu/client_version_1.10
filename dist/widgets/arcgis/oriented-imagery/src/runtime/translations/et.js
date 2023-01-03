@@ -1,0 +1,1 @@
+System.register([],(function(t){return{execute:function(){t({_widgetLabel:"Orienteeritud pildid",toggleButtonOn:"Lülitage välja, et valida kaardil objekte",toggleButtonOff:"Lülitage sisse, et valida pildi vaatamiseks kaardil fookus",viewImage:"Klõpsake siin, et vaadata pildil valitud objekti",updateButton:"Uuenda",deleteButton:"Kustuta"})}}}));

@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({chooseTheme:"Тема",customTheme:"Настройка",resetTheme:"Сбросить",backToMainThemePanel:"Назад",customPaletteTitle:"Настройка цветов палитры",customFontsetTitle:"Настройка набора шрифтов",customAppElementsTitle:"Элементы приложения"})}}}));

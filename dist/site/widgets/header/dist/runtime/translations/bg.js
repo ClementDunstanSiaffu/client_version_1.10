@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({createNew:"Създаване на нова",newExperience:"Нов опит",experiences:"Опити",templates:"Шаблони",developerEdition:"Издание за разработчици"})}}}));

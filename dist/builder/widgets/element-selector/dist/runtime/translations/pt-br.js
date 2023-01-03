@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({pendingElementsInfo:"Esta área lista os widgets que foi configurado mas não na tela atual. Eles podem existir em outros modos do dispositivo.",element:"Inserir widget",new:"Novo",pending:"Pendente",widgetHelpIconLabel:"Sobre este widget",widgetGuideStart:"Obter uma apresentação"})}}}));

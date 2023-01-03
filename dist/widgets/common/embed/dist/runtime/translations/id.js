@@ -1,0 +1,1 @@
+System.register([],(function(a){return{execute:function(){a({_widgetLabel:"Sematan",embedHint:"Sematkan menurut URL atau kode",unSupportUrl:"Ini bukanlah URL yang valid.",unSupportIframeUrl:"Maaf, konten ini tidak dapat disematkan. Ini mungkin membatasi penyematan konten dari situs lain.",maxLimitTips:"Kode HTML melampaui batas karakter maksimum."})}}}));

@@ -1,0 +1,1 @@
+System.register([],(function(n){return{execute:function(){n({subMenuExpandMode:"Režim rozbalení podnabídky",mainMenu:"Hlavní nabídka",subMenu:"Podnabídka"})}}}));

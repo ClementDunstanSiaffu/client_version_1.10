@@ -1,0 +1,1 @@
+System.register([],(function(t){return{execute:function(){t({_widgetLabel:"Orientēti attēli",toggleButtonOn:"Izslēgt, lai kartē atlasītu elementus",toggleButtonOff:"Ieslēgt, lai izvēlētos fokusa punktu kartē un skatītu attēlu",viewImage:"Noklikšķiniet šeit, lai skatītu izvēlēto elementu attēlā",updateButton:"Atjaunināt",deleteButton:"Dzēst"})}}}));

@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({selectMapWidget:"Karten-Widget auswählen",routeSettings:"Routeneinstellungen",searchSettings:"Sucheinstellungen",routeUrl:"Routen-URL",outputStops:"Stopps",outputRoute:"Route",outputDirectionPoints:"Wegbeschreibungspunkte",outputDirectionLines:"Wegbeschreibungslinien"})}}}));

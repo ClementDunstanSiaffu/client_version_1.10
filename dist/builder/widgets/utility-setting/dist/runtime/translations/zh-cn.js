@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({utilityService:"实用工具服务",noUtilityTip:"体验中不包含实用工具。<br/>请添加至少一项实用工具。",removeUtility:"移除实用工具",removeUtilityTitle:"您正在移除实用工具：",breakTip:"此实用工具用于以下微件中，移除此数据可能会损坏这些微件。",breakDesc:"选择要删除的微件和实用工具。 请注意它们将从所有设备视图中移除。 将保留未选中的微件，您可以稍后对其进行重新配置。"})}}}));

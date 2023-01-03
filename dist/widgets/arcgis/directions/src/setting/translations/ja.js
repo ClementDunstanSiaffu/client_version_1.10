@@ -1,0 +1,1 @@
+System.register([],(function(t){return{execute:function(){t({selectMapWidget:"マップ ウィジェットの選択",routeSettings:"ルート設定",searchSettings:"検索設定",routeUrl:"ルート URL",outputStops:"ストップ",outputRoute:"ルート",outputDirectionPoints:"ルート案内ポイント",outputDirectionLines:"ルート案内ライン"})}}}));

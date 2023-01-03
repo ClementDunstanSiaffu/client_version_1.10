@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({createNew:"新規作成",newExperience:"新しいエクスペリエンス",experiences:"エクスペリエンス",templates:"テンプレート",developerEdition:"Developer Edition"})}}}));

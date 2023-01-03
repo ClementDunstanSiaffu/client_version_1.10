@@ -1,0 +1,1 @@
+System.register([],(function(i){return{execute:function(){i({_widgetLabel:"Tinklelis",widgetProperties:"Valdiklio savybės",widgetFunctions:"Valdiklio funkcijos",widgetName:"valdiklio pavadinimas:",widgetProps:"valdiklio savybės:",tips:"Tinklelis"})}}}));

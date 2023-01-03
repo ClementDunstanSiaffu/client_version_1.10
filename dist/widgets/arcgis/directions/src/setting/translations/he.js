@@ -1,0 +1,1 @@
+System.register([],(function(t){return{execute:function(){t({selectMapWidget:"בחר ווידג'ט של מפה",routeSettings:"הגדרות מסלול",searchSettings:"הגדרות חיפוש",routeUrl:"URL של המסלול",outputStops:"עצירות",outputRoute:"מסלול",outputDirectionPoints:"נקודות כיוונים",outputDirectionLines:"קווי כיוונים"})}}}));

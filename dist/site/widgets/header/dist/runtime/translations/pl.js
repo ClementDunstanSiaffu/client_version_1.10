@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({createNew:"Utwórz nowe",newExperience:"Nowe środowisko",experiences:"Środowiska",templates:"Szablony",developerEdition:"Developer Edition"})}}}));

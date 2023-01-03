@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"กล่องเครื่องมือ 3D",select3DScene:"โปรดเลือกซีน 3D เพื่อเปิดใช้งานวิดเจ็ตนี้",clearEffect:"ลบเอฟเฟกต์",clearAnalysis:"ลบการวิเคราะห์",showDevelopmentLayer:"แสดงชั้นข้อมูลการพัฒนา"})}}}));

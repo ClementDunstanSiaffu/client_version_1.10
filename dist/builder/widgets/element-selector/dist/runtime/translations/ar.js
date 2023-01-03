@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({pendingElementsInfo:"تدرج هذه المنطقة عناصر واجهة المستخدم التي تم تكوينها لكن ليست في اللوحة الحالية. قد تظهر في أوضاع الجهاز الأخرى.",element:"إدراج عنصر واجهة استخدام",new:"جديد",pending:"مُعلق",widgetHelpIconLabel:"نبذة عن عنصر واجهة المستخدم هذا",widgetGuideStart:"ابدأ جولة"})}}}));

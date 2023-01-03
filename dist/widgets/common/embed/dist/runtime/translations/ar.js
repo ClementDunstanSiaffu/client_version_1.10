@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"مضمن",embedHint:"تضمين حسب عنوان URL أو الرمز",unSupportUrl:"ليس عنوان URL صالح.",unSupportIframeUrl:"عذرًا، لا يمكن تضمين هذا المحتوى. قد يقيد تضمين المحتوى من المواقع الأخرى.",maxLimitTips:"التعليمات البرمجية لـ HTML تتجاوز الحد الأقصى لعدد الأحرف."})}}}));

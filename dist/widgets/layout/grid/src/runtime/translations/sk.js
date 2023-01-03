@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Mriežka",widgetProperties:"Vlastnosti widgetu",widgetFunctions:"Funkcie widgetu",widgetName:"názov widgetu:",widgetProps:"vlastnosti widgetu:",tips:"Mriežka"})}}}));

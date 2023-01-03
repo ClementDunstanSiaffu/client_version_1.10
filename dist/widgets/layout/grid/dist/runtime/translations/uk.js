@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Грід",widgetProperties:"Властивості віджету",widgetFunctions:"Функції віджету",widgetName:"назва віджету:",widgetProps:"властивості віджету:",tips:"Грід"})}}}));

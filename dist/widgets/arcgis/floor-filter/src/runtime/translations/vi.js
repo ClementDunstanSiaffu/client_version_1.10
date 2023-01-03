@@ -1,0 +1,1 @@
+System.register([],(function(n){return{execute:function(){n({_widgetLabel:"Bộ lọc Tầng",floorfilter_noMap:"Bộ lọc Tầng",floorfilter_notFloorAware:"Bản đồ đã chọn không nhận biết được tầng"})}}}));

@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Capes del mapa",goto:"Aplica el zoom a",information:"Detalls",increaseOpacity:"Augmenta l'opacitat",decreaseOpacity:"Redueix l'opacitat",showLabels:"Mostra les etiquetes",hideLabels:"Amaga les etiquetes"})}}}));

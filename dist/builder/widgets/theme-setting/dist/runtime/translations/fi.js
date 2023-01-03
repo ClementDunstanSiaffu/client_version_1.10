@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({chooseTheme:"Teema",customTheme:"Mukauta",resetTheme:"Palauta",backToMainThemePanel:"Edellinen",customPaletteTitle:"Mukauta paletin värejä",customFontsetTitle:"Mukauta fonttijoukkoa",customAppElementsTitle:"Sovelluksen elementit"})}}}));

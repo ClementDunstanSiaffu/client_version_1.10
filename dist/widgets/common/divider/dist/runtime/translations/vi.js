@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Bộ chia",quickStyleItem:"Thay đổi kiểu nhanh {index}"})}}}));

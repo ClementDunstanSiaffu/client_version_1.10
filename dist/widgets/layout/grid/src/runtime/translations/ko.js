@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"그리드",widgetProperties:"위젯 등록정보",widgetFunctions:"위젯 기능",widgetName:"위젯 이름:",widgetProps:"위젯 등록정보:",tips:"그리드"})}}}));

@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Geschossdeckenfilter",floorfilter_noMap:"Geschossdeckenfilter",floorfilter_notFloorAware:"Die ausgewählte Karte ist nicht geschossbezogen"})}}}));

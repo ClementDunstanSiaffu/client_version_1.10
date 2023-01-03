@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Mreža",widgetProperties:"Svojstva vidžeta",widgetFunctions:"Funkcije vidžeta",widgetName:"ime vidžeta:",widgetProps:"svojstva vidžeta:",tips:"Mreža"})}}}));

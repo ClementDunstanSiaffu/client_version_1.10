@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({chooseTheme:"Tema",customTheme:"Anpassa",resetTheme:"Återställ",backToMainThemePanel:"Backa",customPaletteTitle:"Anpassa palettfärgerna",customFontsetTitle:"Anpassa teckensnittsuppsättningen",customAppElementsTitle:"Appelement"})}}}));

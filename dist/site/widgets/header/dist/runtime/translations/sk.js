@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({createNew:"Vytvoriť novú",newExperience:"Nový zážitok",experiences:"Zážitky",templates:"Šablóny",developerEdition:"Vývojárska edícia"})}}}));

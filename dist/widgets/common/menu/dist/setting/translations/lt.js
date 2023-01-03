@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({subMenuExpandMode:"Submeniu išplėtimo režimas",mainMenu:"Pagrindinis meniu",subMenu:"Submeniu"})}}}));

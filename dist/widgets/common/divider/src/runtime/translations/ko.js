@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"구분선",quickStyleItem:"빠른 스타일 {index}"})}}}));

@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"타임라인",overallTimeExtent:"전체 시간 범위",filteringApplied:"타임라인 필터링이 적용됨",noTlFromHonoredMapWarning:"죄송합니다. 해당 맵에 문제가 발생한 것 같습니다. 유효한 시간 설정을 가져올 수 없습니다.",invalidTimeSpanWarning:"위젯 구성을 확인하여 시간 범위가 유효한지 확인하세요."})}}}));

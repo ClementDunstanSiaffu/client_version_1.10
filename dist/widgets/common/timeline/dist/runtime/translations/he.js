@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"ציר זמן",overallTimeExtent:"תיחום זמן כולל",filteringApplied:"סינון ציר זמן הוחל",noTlFromHonoredMapWarning:"אופס! נראה שמשהו השתבש עם מפה זו ואיננו יכולים לקבל הגדרות זמן תקינות.",invalidTimeSpanWarning:"בדוק את תצורות הווידג'ט כדי לוודא שטווח הזמן תקין."})}}}));
