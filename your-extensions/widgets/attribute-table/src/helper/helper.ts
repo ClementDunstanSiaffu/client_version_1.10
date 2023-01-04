@@ -1,4 +1,3 @@
-import Color from "esri/Color";
 
 class Helper {
 
