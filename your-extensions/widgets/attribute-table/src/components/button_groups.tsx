@@ -1,6 +1,6 @@
 
 import {React,jsx} from 'jimu-core';
-import {Tabs, Tab, Dropdown, DropdownButton, DropdownMenu, DropdownItem, Button, ButtonGroup} from "jimu-ui";
+import {Dropdown, DropdownButton, DropdownMenu, DropdownItem, Button, ButtonGroup} from "jimu-ui";
 import {WidgetFilterOutlined} from "jimu-icons/outlined/brand/widget-filter";
 import {CloseOutlined} from 'jimu-icons/outlined/editor/close'
 import {ColorsOutlined} from 'jimu-icons/outlined/application/colors'
@@ -8,7 +8,6 @@ import {ExportOutlined} from 'jimu-icons/outlined/editor/export'
 import { ClearSelectionOutlined } from 'jimu-icons/outlined/gis/clear-selection'
 import { ClearOutlined } from 'jimu-icons/outlined/editor/clear'
 import { BrushOutlined } from 'jimu-icons/outlined/editor/brush'
-// import { ColorPicker } from 'jimu-ui/basic/color-picker';
 import { ColorPicker } from 'jimu-ui/basic/color-picker';
 import esriRequest from "esri/request";
 import { Download } from '../helper/download';
