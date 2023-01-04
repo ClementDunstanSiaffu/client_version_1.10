@@ -122,42 +122,83 @@ export default class ButtonGroupComponent extends React.PureComponent<PropsType,
 
     optionColorRandom(){
         const self = this.props?.parent;
-        const activeTable = self.getActiveTable();
-        const uniqueValuesInfosSave = self.uniqueValuesInfosSave;
+        self.optionColorFound(null);
+        // const activeTable = self.getActiveTable();
+        // const uniqueValuesInfosSave = self.uniqueValuesInfosSave;
+        // const jimuLayerViews = self.props.stateValue.value.getAllJimuLayerViews();
 
-        if(activeTable && activeTable.highlightIds.items){
-            let arrayItemSelected = activeTable.highlightIds?.items;
+        // if(activeTable && jimuLayerViews){
+        //     // let arrayItemSelected = activeTable.highlightIds?.items;
+        //     let arrayItemSelected = activeTable.highlightIds;
 
-            if(arrayItemSelected){
-                if(!uniqueValuesInfosSave[activeTable.layer.uid]) uniqueValuesInfosSave[activeTable.layer.uid] = [];
 
-                //salvo vecchio renderer
-                if(!uniqueValuesInfosSave[activeTable.layer.uid]){
-                    uniqueValuesInfosSave[activeTable.layer.uid] = activeTable.layer.renderer;
-                }
 
-                for(let i=0;i<arrayItemSelected.length;i++){
-                    let objectid = arrayItemSelected[i];
-                    uniqueValuesInfosSave[activeTable.layer.uid].push({
-                        label: objectid,
-                        value: objectid,
-                        symbol: self?.createSymbol(activeTable.layer.geometryType,[
-                            Math.floor(Math.random() * 256),
-                            Math.floor(Math.random() * 256),
-                            Math.floor(Math.random() * 256)
-                        ])
-                    });
-                }
+        //     if(arrayItemSelected){
 
-                activeTable.highlightIds.removeAll();
+        //         const keys = Object.keys(jimuLayerViews)
+        //         if (keys.length){
+        //             keys.forEach((key)=>{
+        //                 if (jimuLayerViews[key].layer.id === activeTable.layer.id){
+        //                     if (jimuLayerViews[key].layer){
+        //                         jimuLayerViews[key].layer.opacity = 1;
+        //                     }
+        //                     if (jimuLayerViews[key].view){
+        //                         jimuLayerViews[key].view.fullOpacity = 1;
+        //                     }
+        //                 }
+        //             })
+        //         }
 
-                activeTable.layer.renderer = {
-                    type: "unique-value",
-                    field: activeTable.layer.objectIdField,
-                    uniqueValueInfos: uniqueValuesInfosSave[activeTable.layer.uid]
-                };
-            }
-        }
+        //         if(!uniqueValuesInfosSave[activeTable.layer.uid]) uniqueValuesInfosSave[activeTable.layer.uid] = [];
+
+        //         //salvo vecchio renderer
+        //         // if(!uniqueValuesInfosSave[activeTable.layer.uid]){
+        //         //     uniqueValuesInfosSave[activeTable.layer.uid] = activeTable.layer.renderer;
+        //         // }
+        //         const items = arrayItemSelected?.items??[];
+        //         if (items.length){
+        //             for(let i=0;i<items.length;i++){
+        //                 let objectid = items[i];
+        //                 uniqueValuesInfosSave[activeTable.layer.uid].push({
+        //                     label: objectid,
+        //                     value: objectid,
+        //                     symbol: self?.createSymbol(activeTable.layer.geometryType,[
+        //                         Math.floor(Math.random() * 256),
+        //                         Math.floor(Math.random() * 256),
+        //                         Math.floor(Math.random() * 256)
+        //                     ])
+        //                 });
+        //             }
+        //             // activeTable.highlightIds.removeAll();
+
+        //             activeTable.layer.renderer = {
+        //                 type: "unique-value",
+        //                 field: activeTable.layer.objectIdField,
+        //                 uniqueValueInfos: uniqueValuesInfosSave[activeTable.layer.uid]
+        //             };
+        //         }
+        //         // for(let i=0;i<arrayItemSelected.length;i++){
+        //         //     let objectid = arrayItemSelected[i];
+        //         //     uniqueValuesInfosSave[activeTable.layer.uid].push({
+        //         //         label: objectid,
+        //         //         value: objectid,
+        //         //         symbol: self?.createSymbol(activeTable.layer.geometryType,[
+        //         //             Math.floor(Math.random() * 256),
+        //         //             Math.floor(Math.random() * 256),
+        //         //             Math.floor(Math.random() * 256)
+        //         //         ])
+        //         //     });
+        //         // }
+
+        //         // activeTable.highlightIds.removeAll();
+
+        //         // activeTable.layer.renderer = {
+        //         //     type: "unique-value",
+        //         //     field: activeTable.layer.objectIdField,
+        //         //     uniqueValueInfos: uniqueValuesInfosSave[activeTable.layer.uid]
+        //         // };
+        //     }
+        // }
     }
 
     optionFilterRemove(){

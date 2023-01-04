@@ -402,11 +402,9 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                     keys.forEach((key)=>{
                         if (jimuLayerViews[key].layer.id === activeTable.layer.id){
                             if (jimuLayerViews[key].layer){
-                                console.log("checking layer")
                                 jimuLayerViews[key].layer.opacity = 1;
                             }
                             if (jimuLayerViews[key].view){
-                                console.log("checking view")
                                 jimuLayerViews[key].view.fullOpacity = 1;
                             }
                         }
@@ -424,10 +422,15 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                 if (items.length){
                     for (let i =0;i <items.length;i++){
                         let objectid = items[i];
+                        let color = event;
+                        if (!color){
+                            color = [Math.floor(Math.random() * 256),Math.floor(Math.random() * 256),Math.floor(Math.random() * 256)]
+                        }
                         const uniqueColor = {
                             label: objectid,
                             value: objectid,
-                            symbol: this.createSymbol(activeTable.layer.geometryType,event)
+                            symbol: this.createSymbol(activeTable.layer.geometryType,color)
+                            // symbol: this.createSymbol(activeTable.layer.geometryType,event)
                         };
                         let indexFound = null;
                         if (uniqueValuesInfosSave[activeTable.layer.id]?.length){
@@ -487,7 +490,9 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                 console.log( activeTable.layer,"check layer")
             }
         }
-        this.setState({selectedColor:event});
+        if (event){
+            this.setState({selectedColor:event});
+        }
     }
 
     optionColorCleanSelected(cleanHighLightIds = true){
