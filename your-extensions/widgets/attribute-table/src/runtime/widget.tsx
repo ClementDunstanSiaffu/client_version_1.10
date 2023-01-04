@@ -417,41 +417,74 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
 
                 //salvo vecchio renderer
                 if(!saveOldRenderer[activeTable.layer.id]){
-                    saveOldRenderer[activeTable.layer.id] = activeTable.layer.renderer;
+                    this.saveOldRenderer[activeTable.layer.id] = activeTable.layer.renderer;
+                    // saveOldRenderer[activeTable.layer.id] = activeTable.layer.renderer;
                 }
-
-                const symbolType = activeTable.layer.renderer.type;
-                console.log(symbolType,activeTable.layer,"check type")
-
-                for(let i=0;i<arrayItemSelected.length;i++){
-                    let objectid = arrayItemSelected[i];
-                    const uniqueColor = {
-                        label: objectid,
-                        value: objectid,
-                        symbol: this.createSymbol(activeTable.layer.geometryType,event)
-                    };
-                    let indexFound = null;
-                    for(let j=0;j< uniqueValuesInfosSave[activeTable.layer.id].length;j++){
-                        let uniqueFound = uniqueValuesInfosSave[activeTable.layer.id][j].value;
-                        if(uniqueFound === objectid){
-                            indexFound = j;
-                            break;
+                const items = arrayItemSelected?.items??[];
+                if (items.length){
+                    for (let i =0;i <items.length;i++){
+                        let objectid = items[i];
+                        const uniqueColor = {
+                            label: objectid,
+                            value: objectid,
+                            symbol: this.createSymbol(activeTable.layer.geometryType,event)
+                        };
+                        let indexFound = null;
+                        if (uniqueValuesInfosSave[activeTable.layer.id]?.length){
+                            for(let j=0;j< uniqueValuesInfosSave[activeTable.layer.id].length;j++){
+                                let uniqueFound = uniqueValuesInfosSave[activeTable.layer.id][j].value;
+                                if(uniqueFound === objectid){
+                                    indexFound = j;
+                                    break;
+                                }
+                            }
                         }
+                        if(indexFound){
+                            uniqueValuesInfosSave[activeTable.layer.id][indexFound] = uniqueColor;
+                        }else{
+                            uniqueValuesInfosSave[activeTable.layer.id].push(uniqueColor);
+                        }
+                        activeTable.layer.renderer = {
+                            type: "unique-value",
+                            field: activeTable.layer.objectIdField,
+                            uniqueValueInfos:uniqueValuesInfosSave[activeTable.layer.id]
+                        };
                     }
-                    if(indexFound){
-                        uniqueValuesInfosSave[activeTable.layer.id][indexFound] = uniqueColor;
-                    }else{
-                        uniqueValuesInfosSave[activeTable.layer.id].push(uniqueColor);
-                    }
-
                 }
-                helper.updateSymbol(activeTable,event)
+                // const symbolType = activeTable.layer.renderer.type;
+                // console.log(symbolType,activeTable.layer,"check type")
+
+                // for(let i=0;i<arrayItemSelected.length;i++){
+                //     let objectid = arrayItemSelected[i];
+                //     console.log(arrayItemSelected,"check object id")
+                //     const uniqueColor = {
+                //         label: objectid,
+                //         value: objectid,
+                //         symbol: this.createSymbol(activeTable.layer.geometryType,event)
+                //     };
+                //     let indexFound = null;
+                //     for(let j=0;j< uniqueValuesInfosSave[activeTable.layer.id].length;j++){
+                //         let uniqueFound = uniqueValuesInfosSave[activeTable.layer.id][j].value;
+                //         if(uniqueFound === objectid){
+                //             indexFound = j;
+                //             break;
+                //         }
+                //     }
+                //     if(indexFound){
+                //         uniqueValuesInfosSave[activeTable.layer.id][indexFound] = uniqueColor;
+                //     }else{
+                //         uniqueValuesInfosSave[activeTable.layer.id].push(uniqueColor);
+                //     }
+
+                // }
+                // helper.updateSymbol(activeTable,event)
 
                 // activeTable.layer.renderer = {
                 //     type: "unique-value",
                 //     field: activeTable.layer.objectIdField,
                 //     uniqueValueInfos: this.uniqueValuesInfosSave[activeTable.layer.id]
                 // };
+                console.log( activeTable.layer,"check layer")
             }
         }
         this.setState({selectedColor:event});

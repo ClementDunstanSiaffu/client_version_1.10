@@ -96,19 +96,22 @@ class Helper {
         const renderer = activeTable.layer.renderer;
         const highlightedItems = activeTable?.highlightIds?._items??[];
         const fields = activeTable.layer.fields;
-        console.log(highlightedItems,fields,"check atctive table");
+        console.log(activeTable,"check active table")
         if (renderer){
             switch(renderer.type){
                 case "class-breaks":
+                    // this.updateVisulaVariables(renderer,color,activeTable.layer.objectIdField,highlightedItems)
                     this.loopUpdateSymbol(renderer?.classBreakInfos,color,fields,highlightedItems);
                     break;
                 case "unique-value":
-                    console.log(renderer.field,activeTable.layer.objectIdField)
+                    // this.updateVisulaVariables(renderer,color,activeTable.layer.objectIdField,highlightedItems)
+                    // console.log(renderer.field,activeTable.layer.objectIdField)
                     this.loopUpdateSymbol(renderer?.uniqueValueInfos,color,fields,highlightedItems)
                     break;
                 case "simple":
                     if (renderer.hasOwnProperty("symbol")){
-                        this.makeFieldInvisible(fields,highlightedItems)
+                        // this.updateVisulaVariables(renderer,color,activeTable.layer.objectIdField,highlightedItems)
+                        // this.makeFieldInvisible(fields,highlightedItems)
                         renderer.symbol.color = color;
                         if (renderer.symbol?.outline){
                             renderer.symbol.outline.color = color;
@@ -119,26 +122,50 @@ class Helper {
         }
     }
 
-    makeFieldInvisible = (fields:any[],highlighedItems:any[])=>{
-        if (fields?.length && highlighedItems?.length){
-            for (let j=0;j < fields.length;j++){
-                if (highlighedItems.includes(fields[j])){
-                    if (fields[j].hasOwnProperty("visible") && !fields[j].visible){
-                        fields[j].visible = true;
-                    } 
-                }else{
-                    if (fields[j].hasOwnProperty("visible") && fields[j].visible){
-                        fields[j].visible = false;
-                    } 
+    updateVisulaVariables = (renderer:any,color:string,field:string,highlighedItems:string[])=>{
+        if (renderer){
+            renderer.visualVariables = [
+                {
+                    type:"color",
+                    field:field,
+                    stops: this.getStops(highlighedItems,color)
                 }
-            }
+            ]
         }
+        console.log(renderer)
     }
 
+    getStops = (highlighedItems:string[],color:string)=>{
+        let stopsArray = [];
+        for (let i =0;i< highlighedItems.length;i++){
+            const object = {value:highlighedItems[i],color:color,label:`label-${highlighedItems[i]}`};
+            stopsArray.push(object);
+        }
+        return stopsArray;
+    }
+
+    // makeFieldInvisible = (fields:any[],highlighedItems:any[])=>{
+    //     if (fields?.length && highlighedItems?.length){
+    //         for (let j=0;j < fields.length;j++){
+    //             if (highlighedItems.includes(fields[j])){
+    //                 if (fields[j].hasOwnProperty("visible") && !fields[j].visible){
+    //                     fields[j].visible = true;
+    //                 } 
+    //             }else{
+    //                 if (fields[j].hasOwnProperty("visible") && fields[j].visible){
+    //                     fields[j].visible = false;
+    //                 } 
+    //             }
+    //         }
+    //     }
+    //     console.log(fields,"check fields")
+    // }
+
     loopUpdateSymbol = (classBreakInfos:any[],color:string,fields:any[],highlighedItems:any[])=>{
+        console.log(classBreakInfos,"check infos")
         if (classBreakInfos?.length && color){
             for (let i = 0;i < classBreakInfos.length;i++){
-                this.makeFieldInvisible(fields,highlighedItems)
+                // this.makeFieldInvisible(fields,highlighedItems)
                 classBreakInfos[i].symbol.color = color;
                 if (classBreakInfos[i].symbol.hasOwnProperty("outline")){
                     classBreakInfos[i].symbol.outline.color = color;
