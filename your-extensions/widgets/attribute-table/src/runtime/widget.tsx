@@ -8,6 +8,7 @@ import reactiveUtils from 'esri/core/reactiveUtils';
 import Polygon from 'esri/geometry/Polygon';
 import Query from 'esri/rest/support/Query';
 import FeatureTable from 'esri/widgets/FeatureTable';
+import defaultMessages from './translations/default'
 
 type spatialRelationshipType = "intersects" | "contains" | "crosses" | "disjoint" | "envelope-intersects" | "index-intersects" | "overlaps" | "touches" | "within" | "relation"
 
@@ -50,7 +51,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
             tabs:[],
             selectedColor:" ",
             viewExtent:null,
-            features:null
+            features:null,
         }
 
         this.tabsClose = this.tabsClose.bind(this);
@@ -95,6 +96,10 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
             helper.openSideBar(checkedLayers,numberOfAttribute);
             this.props.dispatch(appActions.widgetStatePropChange("value","createTable",false));
         }
+    }
+
+    nls = (id: string) => {
+        return this.props.intl ? this.props.intl.formatMessage({ id: id, defaultMessage: defaultMessages[id] }) : id
     }
 
   
@@ -263,6 +268,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                 this.props.dispatch(appActions.widgetStatePropChange("value","checkedLayers",[]));
                 const jimuLayerViews = this.props.stateValue.value.getAllJimuLayerViews();
                 helper.unhighlightAllLayer(jimuLayerViews);
+            }else{
+                this.props.dispatch(appActions.widgetStatePropChange("value","showAlert",true));
             } 
         }
        
@@ -335,9 +342,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
         return null;
     }
 
-    optionFilterExtentions(){
-        this.props.dispatch(appActions.widgetStatePropChange("value","createTable",true));
-    }
+    optionFilterExtentions(){this.props.dispatch(appActions.widgetStatePropChange("value","createTable",true));}
 
     optionOpenFilter(e){
 

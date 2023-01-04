@@ -11,7 +11,7 @@ import SketchViewModel from 'esri/widgets/Sketch/SketchViewModel';
 import GraphicsLayer from 'esri/layers/GraphicsLayer';
 import CSVLayer from 'esri/layers/CSVLayer';
 import Polygon from 'esri/geometry/Polygon';
-
+import AlertComponent from '../component/common/alert';
 
 type StateValueType = {stateValue:any}
 
@@ -29,6 +29,8 @@ export default class AdvancedSelectionTable extends React.PureComponent<AllWidge
     constructor(props:AllWidgetProps<any>&StateValueType){
         super(props);
         this.getAllCheckedLayers = this.getAllCheckedLayers.bind(this);
+        this.onCloseAlert = this.onCloseAlert.bind(this);
+
     }
 
     state = {
@@ -54,6 +56,9 @@ export default class AdvancedSelectionTable extends React.PureComponent<AllWidge
     nls = (id: string) => {
         return this.props.intl ? this.props.intl.formatMessage({ id: id, defaultMessage: defaultMessages[id] }) : id
     }
+
+    onCloseAlert = ()=>this.props.dispatch(appActions.widgetStatePropChange("value","showAlert",false));
+
 
     getAllCheckedLayers = ()=>{
         const activeView = AdvancedSelectionTable.activeView;
@@ -146,6 +151,8 @@ export default class AdvancedSelectionTable extends React.PureComponent<AllWidge
                     this.props.dispatch(appActions.widgetStatePropChange("value","getAllLayers",this.getAllCheckedLayers));
                     this.props.dispatch(appActions.widgetStatePropChange("value","getActiveView",this.getActiveView));
                     this.props.dispatch(appActions.widgetStatePropChange("value","getAllJimuLayerViews",this.getAllJimuLayerViews));
+                }else{
+                    this.props.dispatch(appActions.widgetStatePropChange("value","showAlert",true));
                 }
             })
             .catch((err)=>{})
@@ -286,6 +293,9 @@ export default class AdvancedSelectionTable extends React.PureComponent<AllWidge
  
     render(): React.ReactNode {
         const open = Boolean(this.state.anchorEl);
+        const showAlert = this.props.stateValue?.value?.showAlert??false;
+        console.log(showAlert,"check show alert")
+        const alertText = this.nls("noSelectedItem")
         return(
             <>
                 {
@@ -296,6 +306,7 @@ export default class AdvancedSelectionTable extends React.PureComponent<AllWidge
                     />
                 }
                 <AdvancedSelectionTableContext.Provider value = {{...this.state,"parent":this,...this.props.stateValue?.value}}>
+                    <AlertComponent open = {showAlert} text = {alertText} onClose = {this.onCloseAlert}/>
                     <LayersTable />
                     {this.state.openStatistics && <StatisticsModal />}
                     {open && <Options />}

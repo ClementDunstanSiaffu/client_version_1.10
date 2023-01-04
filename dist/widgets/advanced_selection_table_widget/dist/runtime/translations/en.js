@@ -25,6 +25,7 @@ System.register([], function (_export) {return {execute: function () {_export({
     "cancel":"Cancel",
     "fields":"Fields",
     "selectionAction":"Selection Action",
-    "mapLoading":"Waiting map to load..."
+    "mapLoading":"Waiting map to load...",
+    "noSelectedItem":"No item was selected"
 })}}});
 

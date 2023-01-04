@@ -27,5 +27,6 @@ export default {
     cancel:"Annullamento",
     fields:"Campi",
     selectionAction:"Selezione Azione",
-    mapLoading:"In attesa del caricamento della mappa..."
+    mapLoading:"In attesa del caricamento della mappa...",
+    noSelectedItem:"Non è stata selezionata alcuna voce"
 }
