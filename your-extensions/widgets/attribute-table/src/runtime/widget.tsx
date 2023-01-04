@@ -1,11 +1,7 @@
 /** @jsx jsx */
 import { React, AllWidgetProps, jsx ,IMState, appActions} from 'jimu-core'
-// import {JimuMapView} from "jimu-arcgis";
-// import FeatureTable from "esri/widgets/FeatureTable";
 import '../style.css';
 import {Tabs, Tab} from "jimu-ui";
-// import Query from "esri/rest/support/Query";
-// import Polygon from "esri/geometry/Polygon";
 import helper from '../helper/helper';
 import ButtonGroupComponent from '../components/button_groups';
 import reactiveUtils from 'esri/core/reactiveUtils';
@@ -192,7 +188,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                 clearSelection: true,
                 refreshData: true,
                 toggleColumns: false,
-                // selectedRecordsShowAllToggle: true,
                 zoomToSelection: true,
             },
             selectionColumn: true,
@@ -416,7 +411,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                 //salvo vecchio renderer
                 if(!saveOldRenderer[activeTable.layer.id]){
                     this.saveOldRenderer[activeTable.layer.id] = activeTable.layer.renderer;
-                    // saveOldRenderer[activeTable.layer.id] = activeTable.layer.renderer;
                 }
                 const items = arrayItemSelected?.items??[];
                 if (items.length){
@@ -430,7 +424,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                             label: objectid,
                             value: objectid,
                             symbol: this.createSymbol(activeTable.layer.geometryType,color)
-                            // symbol: this.createSymbol(activeTable.layer.geometryType,event)
                         };
                         let indexFound = null;
                         if (uniqueValuesInfosSave[activeTable.layer.id]?.length){
@@ -454,40 +447,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                         };
                     }
                 }
-                // const symbolType = activeTable.layer.renderer.type;
-                // console.log(symbolType,activeTable.layer,"check type")
-
-                // for(let i=0;i<arrayItemSelected.length;i++){
-                //     let objectid = arrayItemSelected[i];
-                //     console.log(arrayItemSelected,"check object id")
-                //     const uniqueColor = {
-                //         label: objectid,
-                //         value: objectid,
-                //         symbol: this.createSymbol(activeTable.layer.geometryType,event)
-                //     };
-                //     let indexFound = null;
-                //     for(let j=0;j< uniqueValuesInfosSave[activeTable.layer.id].length;j++){
-                //         let uniqueFound = uniqueValuesInfosSave[activeTable.layer.id][j].value;
-                //         if(uniqueFound === objectid){
-                //             indexFound = j;
-                //             break;
-                //         }
-                //     }
-                //     if(indexFound){
-                //         uniqueValuesInfosSave[activeTable.layer.id][indexFound] = uniqueColor;
-                //     }else{
-                //         uniqueValuesInfosSave[activeTable.layer.id].push(uniqueColor);
-                //     }
-
-                // }
-                // helper.updateSymbol(activeTable,event)
-
-                // activeTable.layer.renderer = {
-                //     type: "unique-value",
-                //     field: activeTable.layer.objectIdField,
-                //     uniqueValueInfos: this.uniqueValuesInfosSave[activeTable.layer.id]
-                // };
-                console.log( activeTable.layer,"check layer")
             }
         }
         if (event){

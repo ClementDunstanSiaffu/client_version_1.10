@@ -5,12 +5,8 @@ import Options from '../component/options';
 import StatisticsModal from '../component/statistics';
 import { AdvancedSelectionTableContext } from '../context/context';
 import { JimuMapViewComponent,JimuMapView} from 'jimu-arcgis';
-// import SketchViewModel from "esri/widgets/Sketch/SketchViewModel";
-// import GraphicsLayer from 'esri/layers/GraphicsLayer';
 import helper from '../helper/helper'
-// import CSVLayer from 'esri/layers/CSVLayer';
 import defaultMessages from "../../../advanced_selection_table_widget/src/runtime/translations/default";
-// import Polygon from "esri/geometry/Polygon";
 import SketchViewModel from 'esri/widgets/Sketch/SketchViewModel';
 import GraphicsLayer from 'esri/layers/GraphicsLayer';
 import CSVLayer from 'esri/layers/CSVLayer';
@@ -19,7 +15,6 @@ import Polygon from 'esri/geometry/Polygon';
 
 type StateValueType = {stateValue:any}
 
-// let  sketchLayer = new GraphicsLayer();
 let sketchLayer = new GraphicsLayer()
 
 export default class AdvancedSelectionTable extends React.PureComponent<AllWidgetProps<any>&StateValueType,any>{
