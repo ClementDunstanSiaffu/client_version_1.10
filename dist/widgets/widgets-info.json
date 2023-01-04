@@ -6634,6 +6634,7 @@
       "license": "",
       "properties": {},
       "translatedLocales": [
+        "it",
         "en"
       ],
       "defaultSize": {
@@ -6642,9 +6643,11 @@
       }
     },
     "i18nLabel": {
-      "en": "Selezione avanzata"
+      "it": "Selezione avanzata",
+      "en": "Advanced selection"
     },
     "i18nDescription": {
+      "it": null,
       "en": null
     },
     "uri": "widgets/advanced_selection_table_widget/",
