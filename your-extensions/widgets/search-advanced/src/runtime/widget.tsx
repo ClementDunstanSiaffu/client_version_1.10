@@ -49,11 +49,10 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   static jimuLayerViews = {};
   static activeView = null;
   static selectedResults = [];
+  static currentMapExtent = null;
 
   graphicLayerFound = new GraphicsLayer({listMode:"hide",visible:true});
   graphicLayerSelected = new GraphicsLayer({listMode:"hide",visible:true});
-
-
 
   symbolFound = {
     type: "simple-fill",
@@ -94,7 +93,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
       geometry:null,
       typeSelected:null,
-      listServices: []
+      listServices: [],
+      searchByAddress:false
     }
 
     this.activeViewChangeHandler = this.activeViewChangeHandler.bind(this);
@@ -168,25 +168,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         activeView?.selectFeaturesByGraphic(geometry,"contains").then((results)=>{
             helper.highlightOnlyCheckedLayer(checkedLayers);
             Widget.selectedResults = results;
-            // const selectedLayersContents = helper.getSelectedContentsLayer(results,checkedLayers);
-            // const numberOfAttributes = helper.getNumberOfAttributes(selectedLayersContents);
-            // this.setState({layerContents:selectedLayersContents});
-            // const activeView = Widget.activeView;
-            // const geometry = Polygon.fromExtent(activeView.view.extent).toJSON();
-            // const layerOpen = {
-            //     geometry:geometry,
-            //     typeSelected:"contains",
-            // }
-            // if (Object.keys(numberOfAttributes).length > 0){
-            //     this.props.dispatch(appActions.widgetStatePropChange("value","createTable",true));
-            //     this.props.dispatch(appActions.widgetStatePropChange("value","numberOfAttribute",numberOfAttributes));
-            //     this.props.dispatch(appActions.widgetStatePropChange("value","layerOpen",layerOpen));
-            //     this.props.dispatch(appActions.widgetStatePropChange("value","getAllLayers",this.getAllCheckedLayers));
-            //     this.props.dispatch(appActions.widgetStatePropChange("value","getActiveView",this.getActiveView));
-            //     this.props.dispatch(appActions.widgetStatePropChange("value","getAllJimuLayerViews",this.getAllJimuLayerViews));
-            // }else{
-            //     this.props.dispatch(appActions.widgetStatePropChange("value","showAlert",true));
-            // }
         })
         .catch((err)=>{})
     }
@@ -196,9 +177,9 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     if (jmv) {
 
       Widget.activeView = jmv;
+      Widget.currentMapExtent = jmv.view.extent;
       jmv.view.map.add(this.graphicLayerFound);
       jmv.view.map.add(this.graphicLayerSelected);
-
       const arraySup = Object.keys(jmv.jimuLayerViews)?.reduce((newLayerArray,item)=>{
         if (jmv.jimuLayerViews[item]?.view && jmv.jimuLayerViews[item].layer.type === "feature"){
             let object = {
@@ -227,15 +208,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
           const polygonGraphic = new Graphic({geometry: event.graphic.geometry,symbol: this.symbolFound});
           this.graphicLayerFound.add(polygonGraphic);
           this.selectFeatureLayer(event.graphic);
-          // sketch.update([event?.graphic],{
-          //   enableScaling:false,
-          //   preserveAspectRatio: true,
-          //   toggleToolOnClick:false,
-          // })
         }
       });
-
-      // sketch.on("update",(event)=>{sketch.delete();})
 
       const searchWidget = new Search({
         view: jmv.view,
@@ -251,6 +225,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
           const geometryBuffer: Polygon = geometryEngine.buffer( event.result.feature.geometry, 1, "meters");
           const polygonGraphic = new Graphic({geometry: geometryBuffer,symbol: this.symbolFound});
           this.graphicLayerFound.add(polygonGraphic);
+          this.setState({searchByAddress:true});
         }
       });
   
@@ -499,20 +474,15 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     }else{
       copiedCheckedLayers.push(n);
     }
+    if (this.state.searchByAddress){
+      const activeView = Widget.activeView;
+      const extent = Widget.currentMapExtent;
+      activeView.view.goTo(extent);
+      this.setState({searchByAddress:false})
+    }
     helper.activateLayerOnTheMap(jimuLayerViews,n,e.target.checked);
     this.props.dispatch(appActions.widgetStatePropChange("value","checkedLayers",copiedCheckedLayers));
     this.props.dispatch(appActions.widgetStatePropChange("value","createTable",true));
-    // if(e.target.checked){
-      
-    //   this.state.listServices.push(n);
-    // }else{
-    //   let index = this.state.listServices.indexOf(n);
-    //   if (index > -1) {
-    //     this.state.listServices.splice(index,1);
-    //   }
-    // }
-
-    // this.setState(this.state);
   }
 
   onChangeSlider(e){
@@ -522,9 +492,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   }
 
   onChangeSelectTypeGeometry(e){
-    // @ts-ignore
-    // this.state.typeSelected = e.target.value;
-    // this.setState(this.state);
     this.setState({typeSelected:e.target.value})
   }
 
@@ -566,26 +533,12 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
       //mando layerid ad TableList
 
-      // this.props.dispatch(
-      //     appActions.widgetStatePropChange(
-      //         this.props.config.idWidgetTable,
-      //         "layerOpen",
-      //         {
-      //           typeSelected:this.state.typeSelected,
-      //           geometry:this.state.geometry.toJSON(),
-      //           // listServices:this.state.listServices
-      //         }
-      //     )
-      // );
       const results = Widget.selectedResults;
       const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
       const selectedLayersContents = helper.getSelectedContentsLayer(results,checkedLayers);
       const numberOfAttributes = helper.getNumberOfAttributes(selectedLayersContents);
-      const activeView = Widget.activeView;
       const geometry = this.state.geometry.toJSON();
       const layerOpen = {geometry:geometry,typeSelected:this.state.typeSelected,}
-      // const geometry = Polygon.fromExtent(activeView.view.extent).toJSON();
-      // const layerOpen = {geometry:geometry,typeSelected:this.state.typeSelected,}
       if (Object.keys(numberOfAttributes).length > 0){
         this.props.dispatch(appActions.widgetStatePropChange("value","createTable",true));
         this.props.dispatch(appActions.widgetStatePropChange("value","numberOfAttribute",numberOfAttributes));
@@ -628,7 +581,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                   <CalciteAccordionItem icon-start="car" itemTitle="Seleziona layers da interrogare">
                     <div className="container-fluid mt-3 mb-3">
                       <div className="row">
-                        {/* <label>Layer selezionati: {this.state.listServices.length} / {this.state.arrayLayer.length}</label> */}
                         <label>Layer selezionati: {checkedLayers.length} / {this.state.arrayLayer.length}</label>
                         <MultiSelect
                             items={this.state.arrayLayer}
@@ -677,23 +629,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                 </CalciteAccordion>
 
                 <Button type="primary" className="w-100" onClick={this.onClickResearch}>Ricerca nei layer</Button>
-
-                {/* {this.state.errorMessage && this.state.errorMessage !== "" ? (
-                    <AlertComponent 
-                      open = {this.state.errorMessage && this.state.errorMessage !== ""  ?true:false}
-                      text = {this.state.errorMessage}
-                      type = "warning"
-                      onClose={()=>this.setState({errorMessage:""})}
-                    />
-                    // <Alert
-                    //     form="basic"
-                    //     open
-                    //     text={this.state.errorMessage}
-                    //     type="warning"
-                    //     className="mt-2 w-100"
-                    //     withIcon
-                    // />
-                ) : ("")} */}
                     <AlertComponent 
                       open = {this.state.errorMessage && this.state.errorMessage !== ""  ?true:false}
                       text = {this.state.errorMessage}
