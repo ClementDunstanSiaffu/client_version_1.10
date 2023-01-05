@@ -1,0 +1,18 @@
+{
+  "searchItems": {
+    "url": "https://tsarcgis.aqp.it/server/rest/services/Operational/QUERY_SIT/FeatureServer/0",
+    "queryWhere": "NOMECOMUNE is not null",
+    "outFields": ["OBJECTID","NOMECOMUNE","ISTAT"],
+    "outFieldsDisplay": ["*"]
+  },
+  "searchAmbiti": {
+    "url": "https://tsarcgis.aqp.it/server/rest/services/Operational/QUERY_SIT/FeatureServer/1",
+    "queryWhere": "NOMEAMBITO is not null",
+    "outFields": ["IDAMBITO","NOMEAMBITO"]
+  },
+  "searchSTO": {
+    "url": "https://tsarcgis.aqp.it/server/rest/services/Operational/QUERY_SIT/FeatureServer/2",
+    "queryWhere": "NOMECOMPARTIMENTO is not null",
+    "outFields": ["IDCOMPARTIMENTO ","NOMECOMPARTIMENTO"]
+  }
+}
