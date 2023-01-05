@@ -13,7 +13,8 @@ import {CalciteAccordion, CalciteAccordionItem} from "calcite-components";
 import geometryEngine from "esri/geometry/geometryEngine";
 import Search from "esri/widgets/Search";
 import Sketch from "esri/widgets/Sketch";
-import helper from '../helper/helper'
+import helper from '../helper/helper';
+import AlertComponent from '../components/common/alert'
 
 function Table (props) {
   const { list, handleClick } = props
@@ -40,20 +41,14 @@ function Table (props) {
 }
 
 type stateValueType = {
-  stateValue:{
-    value:{
-      getActiveView:()=>any,
-      createTable:boolean,
-      checkedLayers:string[],            
-      getAllJimuLayerViews:()=>any,
-}}}
+  stateValue:{value:{checkedLayers:string[]}}}
 
 export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>&stateValueType, any> {
 
   static mapExtraStateProps(state:IMState){return {stateValue:state.widgetsState}};
-  static sketch = null;
-  static searchWidget = null;
+  static jimuLayerViews = {};
   static activeView = null;
+  static selectedResults = [];
 
   graphicLayerFound = new GraphicsLayer({listMode:"hide",visible:true});
   graphicLayerSelected = new GraphicsLayer({listMode:"hide",visible:true});
@@ -123,7 +118,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     this.populateAmbiti();
     this.onChangeSelectAmbiti = this.onChangeSelectAmbiti.bind(this);
 
-    this.onChangeTabs = this.onChangeTabs.bind(this)
+    this.onChangeTabs = this.onChangeTabs.bind(this);
+    this.getAllCheckedLayers = this.getAllCheckedLayers.bind(this);
   }
 
   componentDidUpdate() {
@@ -137,157 +133,133 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       this.graphicLayerFound.visible = true;
       this.graphicLayerSelected.visible = true;
     }
-    // if (this.props.stateValue?.value?.createTable && this.props.stateValue?.value?.getActiveView){
-    //   const activeView = this.props.stateValue.value.getActiveView();
-    //   if (activeView && widgetState === WidgetState.Opened){
-    //     this.activeViewChangeHandler(activeView);
-    //     this.props.dispatch(appActions.widgetStatePropChange("value","createTable",false));
-    //   }
-    // }
-    if (!Widget.activeView && widgetState === WidgetState.Opened){
-      const activeView = this.props.stateValue.value.getActiveView();
-      if (activeView){
-        this.activeViewChangeHandler(activeView);
-        Widget.activeView = activeView;
-      }
-    }
-   
   }
 
-  componentDidMount(): void {
-    if (this.props.stateValue?.value?.getActiveView){
-      const activeView = this.props.stateValue.value.getActiveView();
-      if (activeView){
-        this.activeViewChangeHandler(activeView);
-      }
-    }
+  getAllJimuLayerViews = ()=>{
+    const jimuLayerViews = Widget.jimuLayerViews;
+    return jimuLayerViews
   }
+
+  getActiveView = ()=>{
+    const activeView = Widget.activeView;
+    return activeView;
+  }
+
+  getAllCheckedLayers = ()=>{
+    const activeView = Widget.activeView;
+    const allMapLayers = activeView.view.map.allLayers?.items;
+    const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
+    let newMapLayer = [];
+    if (allMapLayers?.length > 0 && checkedLayers.length > 0){
+        newMapLayer = allMapLayers.reduce((newArray,item)=>{
+            if (checkedLayers.includes(item.id)){
+                newArray.push(item);
+            }
+            return newArray;
+        },[])
+    }
+    return newMapLayer;
+  }
+
+  selectFeatureLayer = (geometry:any)=>{
+    const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
+    const activeView = Widget.activeView;
+    if (activeView){
+        activeView?.selectFeaturesByGraphic(geometry,"contains").then((results)=>{
+            helper.highlightOnlyCheckedLayer(checkedLayers);
+            Widget.selectedResults = results;
+            // const selectedLayersContents = helper.getSelectedContentsLayer(results,checkedLayers);
+            // const numberOfAttributes = helper.getNumberOfAttributes(selectedLayersContents);
+            // this.setState({layerContents:selectedLayersContents});
+            // const activeView = Widget.activeView;
+            // const geometry = Polygon.fromExtent(activeView.view.extent).toJSON();
+            // const layerOpen = {
+            //     geometry:geometry,
+            //     typeSelected:"contains",
+            // }
+            // if (Object.keys(numberOfAttributes).length > 0){
+            //     this.props.dispatch(appActions.widgetStatePropChange("value","createTable",true));
+            //     this.props.dispatch(appActions.widgetStatePropChange("value","numberOfAttribute",numberOfAttributes));
+            //     this.props.dispatch(appActions.widgetStatePropChange("value","layerOpen",layerOpen));
+            //     this.props.dispatch(appActions.widgetStatePropChange("value","getAllLayers",this.getAllCheckedLayers));
+            //     this.props.dispatch(appActions.widgetStatePropChange("value","getActiveView",this.getActiveView));
+            //     this.props.dispatch(appActions.widgetStatePropChange("value","getAllJimuLayerViews",this.getAllJimuLayerViews));
+            // }else{
+            //     this.props.dispatch(appActions.widgetStatePropChange("value","showAlert",true));
+            // }
+        })
+        .catch((err)=>{})
+    }
+}
 
   activeViewChangeHandler (jmv: JimuMapView) {
     if (jmv) {
+
+      Widget.activeView = jmv;
       jmv.view.map.add(this.graphicLayerFound);
       jmv.view.map.add(this.graphicLayerSelected);
 
-      let arraySup = [];
-      let  allLayers = [];
-      if (jmv.view.map.allLayers.length){
-        allLayers = [...jmv.view.map.allLayers];
-        allLayers.reverse();
-        allLayers.forEach((f, index) =>{
-          if(f.type === "feature"){
-            arraySup.push({
-              label:f.title,
-              value:f.id
-            });
-          }
-        });
-      } 
-      // jmv.view.map.allLayers.forEach((f, index) =>{
-      //   if(f.type === "feature"){
-      //     arraySup.push({
-      //       label:f.title,
-      //       value:f.id
-      //       // value:index
-      //     });
-      //   }
-      // });
-      if (!Widget.sketch && !Widget.searchWidget){
-        const sketch = new Sketch({
-          layer: this.graphicLayerFound,
-          view: jmv.view,
-          creationMode:"single",
-          container: "sketch-widget-search-advanced",//TODO migliorare senza id cablato
-          availableCreateTools:["polygon", "rectangle", "circle"],
-          visibleElements: {
-            selectionTools:{
-              "lasso-selection": false
-            },
-            settingsMenu: false
-          }
-        });
-  
-        sketch.on("create", (event)=>{
+      const arraySup = Object.keys(jmv.jimuLayerViews)?.reduce((newLayerArray,item)=>{
+        if (jmv.jimuLayerViews[item]?.view && jmv.jimuLayerViews[item].layer.type === "feature"){
+            let object = {
+              label:jmv.jimuLayerViews[item].layer.title??item,
+              value:jmv.jimuLayerViews[item].layer.id
+            };
+            newLayerArray.push(object);
+        }
+        return newLayerArray;
+      },[])
+      Widget.jimuLayerViews = jmv.jimuLayerViews;
+
+      const sketch = new Sketch({
+        layer: this.graphicLayerFound,
+        view: jmv.view,
+        creationMode:"single",
+        container: "sketch-widget-search-advanced",//TODO migliorare senza id cablato
+        availableCreateTools:["polygon", "rectangle", "circle"],
+        visibleElements: {selectionTools:{"lasso-selection": false},settingsMenu: false}
+      });
+
+      sketch.on("create", (event)=>{
+        jmv.view.graphics.removeAll();
+        this.graphicLayerFound.removeAll();
+        if (event.state === "complete") {
+          const polygonGraphic = new Graphic({geometry: event.graphic.geometry,symbol: this.symbolFound});
+          this.graphicLayerFound.add(polygonGraphic);
+          this.selectFeatureLayer(event.graphic);
+          // sketch.update([event?.graphic],{
+          //   enableScaling:false,
+          //   preserveAspectRatio: true,
+          //   toggleToolOnClick:false,
+          // })
+        }
+      });
+
+      // sketch.on("update",(event)=>{sketch.delete();})
+
+      const searchWidget = new Search({
+        view: jmv.view,
+        container: "search-widget-search-advanced"//TODO migliorare senza id cablato
+      });
+
+      searchWidget.on("select-result", (event)=>{
+        if(event && event.result && event.result.feature){
           jmv.view.graphics.removeAll();
           this.graphicLayerFound.removeAll();
   
-          if (event.state === "complete") {
-            const polygonGraphic = new Graphic({
-              geometry: event.graphic.geometry,
-              symbol: this.symbolFound
-            });
-            this.graphicLayerFound.add(polygonGraphic);
-          }
-        });
-
-        const searchWidget = new Search({
-          view: jmv.view,
-          container: "search-widget-search-advanced"//TODO migliorare senza id cablato
-        });
-
-        searchWidget.on("select-result", (event)=>{
-          if(event && event.result && event.result.feature){
-            jmv.view.graphics.removeAll();
-            this.graphicLayerFound.removeAll();
+          //@ts-ignore
+          const geometryBuffer: Polygon = geometryEngine.buffer( event.result.feature.geometry, 1, "meters");
+          const polygonGraphic = new Graphic({geometry: geometryBuffer,symbol: this.symbolFound});
+          this.graphicLayerFound.add(polygonGraphic);
+        }
+      });
   
-            //@ts-ignore
-            const geometryBuffer: Polygon = geometryEngine.buffer( event.result.feature.geometry, 1, "meters");
-  
-            const polygonGraphic = new Graphic({
-              geometry: geometryBuffer,
-              symbol: this.symbolFound
-            });
-  
-            this.graphicLayerFound.add(polygonGraphic);
-  
-          }
-        });
-  
-        searchWidget.on("search-clear", (event)=>{
-          this.graphicLayerFound.removeAll();
-        });
-        Widget.sketch = sketch;
-        Widget.searchWidget = searchWidget
-
-        this.setState({
-          jimuMapView: jmv,
-          searchWidget:searchWidget,
-          sketchWidget:sketch
-        });
-      }
-    
-
-      // const searchWidget = new Search({
-      //   view: jmv.view,
-      //   container: "search-widget-search-advanced"//TODO migliorare senza id cablato
-      // });
-
-      // searchWidget.on("select-result", (event)=>{
-      //   if(event && event.result && event.result.feature){
-      //     jmv.view.graphics.removeAll();
-      //     this.graphicLayerFound.removeAll();
-
-      //     //@ts-ignore
-      //     const geometryBuffer: Polygon = geometryEngine.buffer( event.result.feature.geometry, 1, "meters");
-
-      //     const polygonGraphic = new Graphic({
-      //       geometry: geometryBuffer,
-      //       symbol: this.symbolFound
-      //     });
-
-      //     this.graphicLayerFound.add(polygonGraphic);
-
-      //   }
-      // });
-
-      // searchWidget.on("search-clear", (event)=>{
-      //   this.graphicLayerFound.removeAll();
-      // });
-
+      searchWidget.on("search-clear", (event)=>{this.graphicLayerFound.removeAll();});
       this.setState({
         arrayLayer: arraySup,
-        // jimuMapView: jmv,
-        // searchWidget:searchWidget,
-        // sketchWidget:this.sketch
+        jimuMapView: jmv,
+        searchWidget:searchWidget,
+        sketchWidget:sketch
       });
     }
   }
@@ -512,10 +484,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
   onChangeSelectLayer (e,n,s){
     const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
-    let jimuLayerViews = {};
-    if (this.props.stateValue?.value?.getAllJimuLayerViews){
-      jimuLayerViews = this.props.stateValue?.value?.getAllJimuLayerViews();
-    }
+    const jimuLayerViews = Widget.jimuLayerViews;
     let copiedCheckedLayers = [];
     if (checkedLayers.length ){
       copiedCheckedLayers = [...checkedLayers]
@@ -554,13 +523,14 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
   onChangeSelectTypeGeometry(e){
     // @ts-ignore
-    this.state.typeSelected = e.target.value;
-    this.setState(this.state);
+    // this.state.typeSelected = e.target.value;
+    // this.setState(this.state);
+    this.setState({typeSelected:e.target.value})
   }
 
   async onClickResearch(){
     this.state.jimuMapView.view.map.tables.removeAll();
-
+    const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
     //parametri form
     let arrayGeometry = [];
     //TODO PRENDERE GEOMETRIA
@@ -576,7 +546,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       this.state.geometry = geometryEngine.union(arrayGeometry);
     }
     else arrayErrors.push("Seleziona una geometria in mappa");
-    if(!this.state.listServices.length) arrayErrors.push("Seleziona almeno un servizio");
+    if(!checkedLayers.length) arrayErrors.push("Seleziona almeno un servizio");
     if(!this.state.typeSelected) arrayErrors.push("Seleziona una tipologia di selezione");
 
     this.setState({
@@ -595,17 +565,38 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       });
 
       //mando layerid ad TableList
-      this.props.dispatch(
-          appActions.widgetStatePropChange(
-              this.props.config.idWidgetTable,
-              "layerOpen",
-              {
-                typeSelected:this.state.typeSelected,
-                geometry:this.state.geometry.toJSON(),
-                // listServices:this.state.listServices
-              }
-          )
-      );
+
+      // this.props.dispatch(
+      //     appActions.widgetStatePropChange(
+      //         this.props.config.idWidgetTable,
+      //         "layerOpen",
+      //         {
+      //           typeSelected:this.state.typeSelected,
+      //           geometry:this.state.geometry.toJSON(),
+      //           // listServices:this.state.listServices
+      //         }
+      //     )
+      // );
+      const results = Widget.selectedResults;
+      const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
+      const selectedLayersContents = helper.getSelectedContentsLayer(results,checkedLayers);
+      const numberOfAttributes = helper.getNumberOfAttributes(selectedLayersContents);
+      const activeView = Widget.activeView;
+      const geometry = this.state.geometry.toJSON();
+      const layerOpen = {geometry:geometry,typeSelected:this.state.typeSelected,}
+      // const geometry = Polygon.fromExtent(activeView.view.extent).toJSON();
+      // const layerOpen = {geometry:geometry,typeSelected:this.state.typeSelected,}
+      if (Object.keys(numberOfAttributes).length > 0){
+        this.props.dispatch(appActions.widgetStatePropChange("value","createTable",true));
+        this.props.dispatch(appActions.widgetStatePropChange("value","numberOfAttribute",numberOfAttributes));
+        this.props.dispatch(appActions.widgetStatePropChange("value","layerOpen",layerOpen));
+        this.props.dispatch(appActions.widgetStatePropChange("value","getAllLayers",this.getAllCheckedLayers));
+        this.props.dispatch(appActions.widgetStatePropChange("value","getActiveView",this.getActiveView));
+        this.props.dispatch(appActions.widgetStatePropChange("value","getAllJimuLayerViews",this.getAllJimuLayerViews));
+      }else{
+        this.props.dispatch(appActions.widgetStatePropChange("value","showAlert",true));
+        this.setState({errorMessage:"No item was selected"})
+      }
     }
   }
 
@@ -615,9 +606,9 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
     return (
         <div className="widget-attribute-table jimu-widget">
-          {/* {this.props.hasOwnProperty('useMapWidgetIds') && this.props.useMapWidgetIds && this.props.useMapWidgetIds[0] && (
+          {this.props.hasOwnProperty('useMapWidgetIds') && this.props.useMapWidgetIds && this.props.useMapWidgetIds[0] && (
               <JimuMapViewComponent useMapWidgetId={this.props.useMapWidgetIds?.[0]} onActiveViewChange={this.activeViewChangeHandler} />
-          )} */}
+          )}
           <Tabs defaultValue="search-advanced-tab-indirizzi" type="tabs" onChange={this.onChangeTabs}>
             <Tab id="search-advanced-tab-indirizzi" title="Indirizzi">
               <div>
@@ -687,16 +678,28 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
                 <Button type="primary" className="w-100" onClick={this.onClickResearch}>Ricerca nei layer</Button>
 
-                {this.state.errorMessage && this.state.errorMessage !== "" ? (
-                    <Alert
-                        form="basic"
-                        open
-                        text={this.state.errorMessage}
-                        type="warning"
-                        className="mt-2 w-100"
-                        withIcon
+                {/* {this.state.errorMessage && this.state.errorMessage !== "" ? (
+                    <AlertComponent 
+                      open = {this.state.errorMessage && this.state.errorMessage !== ""  ?true:false}
+                      text = {this.state.errorMessage}
+                      type = "warning"
+                      onClose={()=>this.setState({errorMessage:""})}
                     />
-                ) : ("")}
+                    // <Alert
+                    //     form="basic"
+                    //     open
+                    //     text={this.state.errorMessage}
+                    //     type="warning"
+                    //     className="mt-2 w-100"
+                    //     withIcon
+                    // />
+                ) : ("")} */}
+                    <AlertComponent 
+                      open = {this.state.errorMessage && this.state.errorMessage !== ""  ?true:false}
+                      text = {this.state.errorMessage}
+                      type = "warning"
+                      onClose={()=>this.setState({errorMessage:""})}
+                    />
               </div>
             </Tab>
             <Tab id="search-advanced-tab-comuni" title="Comuni">
