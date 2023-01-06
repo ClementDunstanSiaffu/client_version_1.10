@@ -8,7 +8,9 @@ import reactiveUtils from 'esri/core/reactiveUtils';
 import Polygon from 'esri/geometry/Polygon';
 import Query from 'esri/rest/support/Query';
 import FeatureTable from 'esri/widgets/FeatureTable';
-import defaultMessages from './translations/default'
+import defaultMessages from './translations/default';
+import geometryEngine from "esri/geometry/geometryEngine";
+
 
 type spatialRelationshipType = "intersects" | "contains" | "crosses" | "disjoint" | "envelope-intersects" | "index-intersects" | "overlaps" | "touches" | "within" | "relation"
 
@@ -20,13 +22,16 @@ type stateValueType = {
                 geometry:any,
                 typeSelected:spatialRelationshipType,
                 where?:string,
+                graphicsFound?:any,
+                valueBuffer?:any
             },
             getActiveView:()=>any,
             getAllJimuLayerViews:()=>any,
             checkedLayers:string[],
             numberOfAttribute:{[id:string]:number},
             createTable:boolean,
-            initialMapZoom:any
+            initialMapZoom:any,
+            filterValue:number
         }
     }
 }
@@ -125,7 +130,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                                 </Tab>
                             );
     
-                            this.createTable(fs,layerOpen,fs.id).then((featureTable)=>{
+                            this.createTable(fs,layerOpen).then((featureTable)=>{
                                 if(!featureTable){
                                 }else{
                                 }
@@ -138,7 +143,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                                 <div id={"container-"+newId} className="tabClassControl"></div>
                             </Tab>
                         );
-                        this.createTable(f,layerOpen,newId).then((featureTable)=>{
+                        this.createTable(f,layerOpen).then((featureTable)=>{
                             if(!featureTable){
                             }else{
                             }
@@ -222,7 +227,14 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
 
         });
         reactiveUtils.when(()=>view.stationary,()=>{
-            if (view.extent){
+            let filterByExtention = true;
+            if (
+                this.props.stateValue?.value.hasOwnProperty("filterValue") && 
+                this.props.stateValue?.value.filterValue === 2
+            ){
+                filterByExtention = false;
+            }
+            if (view.extent && filterByExtention){
                 this.setState({viewExtent:view.extent});
             }
         },{initial:true})
@@ -230,15 +242,36 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
         return featureTable;
     }
 
-    async createTable(layer,pass:{geometry:any,typeSelected:spatialRelationshipType,where?:string},identificationTable) {
+    async createTable(layer,pass:{geometry:any,typeSelected:spatialRelationshipType,where?:string,graphicsFound?:any,valueBuffer?:any}) {
         const activeView = this.props.stateValue.value.getActiveView();
         const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
+        const filterValue = this.props.stateValue?.value?.filterValue??1;
         layer.visible = true;
         let featureTable = null;
         let query = new Query();
         const highlightIds = [];
-        if(pass.geometry){
-            query.geometry = new Polygon(pass.geometry);
+        // if(pass.geometry){
+        //     query.geometry = new Polygon(pass.geometry);
+        //     query.spatialRelationship = pass.typeSelected;
+        //     query.outFields = ["*"];
+        //     query.returnGeometry = true;
+        // }
+        const arrayGeometry = [];
+        let geometry = null;
+        if(pass.graphicsFound && typeof pass.valueBuffer === "number"){
+            // query.geometry = new Polygon(pass.geometry);
+            const graphicsFound =  pass.graphicsFound();
+            graphicsFound?.graphics.forEach(g=>{
+                // @ts-ignore
+                g?.geometry = geometryEngine.buffer(g.geometry, pass?.valueBuffer, "meters");
+                arrayGeometry.push(g.geometry);
+            });
+            if(arrayGeometry.length) { // @ts-ignore
+                geometry = geometryEngine.union(arrayGeometry);
+            }
+            if (geometry){
+                query.geometry = new Polygon(geometry);
+            }
             query.spatialRelationship = pass.typeSelected;
             query.outFields = ["*"];
             query.returnGeometry = true;
@@ -251,14 +284,17 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
         }
         const results = await layerView.queryFeatures(query);
         const features = results?.features??[];
-        if(layer && features.length){
+        if(layer && features.length ){
             this.setState({features:features})
             featureTable = this.createFeatureTable(layer,highlightIds);
-            if (activeView.view.stationary && this.state.viewExtent){
+            if (activeView.view.stationary && this.state.viewExtent && filterValue === 1){
                 setTimeout(()=>{
                     featureTable.filterGeometry = this.state.viewExtent;
                 },10)
             }
+            console.log(geometry,"check geometry")
+            // if (pass.geometry && filterValue === 2)featureTable.filterGeometry = pass.geometry;
+            if (geometry && filterValue === 2)featureTable.filterGeometry = geometry;
             featureTable.filterBySelection();
             return featureTable;
         }else{
@@ -473,9 +509,14 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
     }
 
     render () {
+        const filterValue = this.props.stateValue?.value?.filterValue??1;
         return (
             <div className="widget-attribute-table jimu-widget">
-                <ButtonGroupComponent parent = {this} selectedColor = {this.state.selectedColor}/>
+                <ButtonGroupComponent 
+                    parent = {this} 
+                    selectedColor = {this.state.selectedColor}
+                    filterValue = {filterValue}
+                />
                 {this.state.tabs.length === 0 ?
                     <div className="text-center container-fluid">
                         <div className="row">

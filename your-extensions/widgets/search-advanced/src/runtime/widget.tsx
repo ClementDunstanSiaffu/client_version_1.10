@@ -15,6 +15,7 @@ import Search from "esri/widgets/Search";
 import Sketch from "esri/widgets/Sketch";
 import helper from '../helper/helper';
 import AlertComponent from '../components/common/alert'
+import SelectFilterType from '../components/select_filter'
 
 function Table (props) {
   const { list, handleClick } = props
@@ -41,7 +42,7 @@ function Table (props) {
 }
 
 type stateValueType = {
-  stateValue:{value:{checkedLayers:string[]}}}
+  stateValue:{value:{checkedLayers:string[],filterValue:number}}}
 
 export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>&stateValueType, any> {
 
@@ -50,7 +51,9 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   static activeView = null;
   static selectedResults = [];
   static currentMapExtent = null;
+  static foundGeometry = null;
 
+  
   graphicLayerFound = new GraphicsLayer({listMode:"hide",visible:true});
   graphicLayerSelected = new GraphicsLayer({listMode:"hide",visible:true});
 
@@ -94,7 +97,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       geometry:null,
       typeSelected:null,
       listServices: [],
-      searchByAddress:false
+      searchByAddress:false,
+      disableButton:true
     }
 
     this.activeViewChangeHandler = this.activeViewChangeHandler.bind(this);
@@ -122,6 +126,10 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     this.getAllCheckedLayers = this.getAllCheckedLayers.bind(this);
   }
 
+  componentDidMount(): void {
+      this.props.dispatch(appActions.widgetStatePropChange("value","filterValue",2));
+  }
+
   componentDidUpdate() {
     let widgetState: WidgetState = getAppStore().getState().widgetsRuntimeInfo[this.props.id].state;
     if(widgetState === WidgetState.Closed){
@@ -145,6 +153,10 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     return activeView;
   }
 
+  getFoundGeometryArray = ()=>{
+    return Widget.foundGeometry;
+  }
+
   getAllCheckedLayers = ()=>{
     const activeView = Widget.activeView;
     const allMapLayers = activeView.view.map.allLayers?.items;
@@ -166,8 +178,15 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     const activeView = Widget.activeView;
     if (activeView){
         activeView?.selectFeaturesByGraphic(geometry,"contains").then((results)=>{
-            helper.highlightOnlyCheckedLayer(checkedLayers);
-            Widget.selectedResults = results;
+            // helper.highlightOnlyCheckedLayer(checkedLayers);
+            if (results?.length){
+              helper.unhighlightLayer();
+              Widget.selectedResults = results;
+              this.setState({disableButton:false})
+            }else{
+              this.setState({errorMessage:"No item was selected"})
+            }
+         
         })
         .catch((err)=>{})
     }
@@ -486,18 +505,23 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   }
 
   onChangeSlider(e){
-    this.setState({
-      valueBuffer: parseInt(isNaN(e) ? e.target.value: e)
-    });
+    this.setState({valueBuffer: parseInt(isNaN(e) ? e.target.value: e)});
+    if (Widget.selectedResults.length){
+      this.setState({disableButton:false})
+    }
   }
 
   onChangeSelectTypeGeometry(e){
-    this.setState({typeSelected:e.target.value})
+    this.setState({typeSelected:e.target.value});
+    if (Widget.selectedResults.length){
+      this.setState({disableButton:false})
+    }
   }
 
   async onClickResearch(){
     this.state.jimuMapView.view.map.tables.removeAll();
     const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
+    Widget.foundGeometry = this.graphicLayerFound;
     //parametri form
     let arrayGeometry = [];
     //TODO PRENDERE GEOMETRIA
@@ -532,13 +556,18 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       });
 
       //mando layerid ad TableList
-
       const results = Widget.selectedResults;
       const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
       const selectedLayersContents = helper.getSelectedContentsLayer(results,checkedLayers);
       const numberOfAttributes = helper.getNumberOfAttributes(selectedLayersContents);
-      const geometry = this.state.geometry.toJSON();
-      const layerOpen = {geometry:geometry,typeSelected:this.state.typeSelected,}
+      // const geometry = this.state.geometry.toJSON();
+      const geometry = this.state.geometry;
+      const layerOpen = {
+        geometry:geometry,
+        typeSelected:this.state.typeSelected,
+        valueBuffer:this.state.valueBuffer,
+        graphicsFound:this.getFoundGeometryArray
+      }
       if (Object.keys(numberOfAttributes).length > 0){
         this.props.dispatch(appActions.widgetStatePropChange("value","createTable",true));
         this.props.dispatch(appActions.widgetStatePropChange("value","numberOfAttribute",numberOfAttributes));
@@ -550,6 +579,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         this.props.dispatch(appActions.widgetStatePropChange("value","showAlert",true));
         this.setState({errorMessage:"No item was selected"})
       }
+      this.setState({disableButton:true})
     }
   }
 
@@ -557,6 +587,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   //TODO config abilitare tab true/false
   render () {
     const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
+    const filterValue = this.props.stateValue?.value?.filterValue??1;
     return (
         <div className="widget-attribute-table jimu-widget">
           {this.props.hasOwnProperty('useMapWidgetIds') && this.props.useMapWidgetIds && this.props.useMapWidgetIds[0] && (
@@ -626,9 +657,18 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                       </div>
                     </div>
                   </CalciteAccordionItem>
+                  <CalciteAccordionItem icon-start="car" itemTitle ="Select filter type">
+                    <div className="container-fluid mt-3 mb-3">
+                      {/* <div className="row"> */}
+                        <SelectFilterType parent = {this} filterValue = {filterValue} />
+                      {/* </div> */}
+                    </div>
+                  </CalciteAccordionItem>
                 </CalciteAccordion>
 
-                <Button type="primary" className="w-100" onClick={this.onClickResearch}>Ricerca nei layer</Button>
+                <Button type= {this.state.disableButton ?"secondary" :"primary"} className="w-100" onClick={this.onClickResearch} disabled = {this.state.disableButton}>
+                  Ricerca nei layer
+                </Button>
                     <AlertComponent 
                       open = {this.state.errorMessage && this.state.errorMessage !== ""  ?true:false}
                       text = {this.state.errorMessage}

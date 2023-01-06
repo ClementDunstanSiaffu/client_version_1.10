@@ -105,6 +105,16 @@ class Helper{
         }
         return selectedLayersArray;
     }
+
+    unhighlightLayer = ()=>{
+        const jimuLayerViews = Widget.jimuLayerViews??[];
+        const keys = Object.keys(jimuLayerViews);
+        if (keys.length > 0){
+            keys.forEach((key)=>{
+                jimuLayerViews[key]?.highLightHandle?.remove()
+            })
+        } 
+    }
 }
 
 export default new Helper();

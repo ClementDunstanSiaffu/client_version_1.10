@@ -11,11 +11,13 @@ import { BrushOutlined } from 'jimu-icons/outlined/editor/brush'
 import { ColorPicker } from 'jimu-ui/basic/color-picker';
 import esriRequest from "esri/request";
 import { Download } from '../helper/download';
-import Widget from '../runtime/widget'
+import Widget from '../runtime/widget';
+import SelectFilterType from './select_filter';
 
 type PropsType = {
     parent:Widget,
-    selectedColor:string
+    selectedColor:string,
+    filterValue:number
 }
 
 export default class ButtonGroupComponent extends React.PureComponent<PropsType,any>{
@@ -138,6 +140,7 @@ export default class ButtonGroupComponent extends React.PureComponent<PropsType,
     setButtonFilter(){
         let buttonFilter;
         const self = this.props?.parent;
+        const filterValue = this.props.filterValue
         if(this.state.geometryFilter){
             buttonFilter = <div>
                 <Button onClick={this.optionFilterRemove} size="default">
@@ -155,6 +158,7 @@ export default class ButtonGroupComponent extends React.PureComponent<PropsType,
                 <Button onClick={self?.optionCloseAllTabs} size="default">
                     <CloseOutlined/> Chiudi tutti i tab
                 </Button>
+                <SelectFilterType parent={self} filterValue = {filterValue}/>
             </div>;
         }
         return buttonFilter;
