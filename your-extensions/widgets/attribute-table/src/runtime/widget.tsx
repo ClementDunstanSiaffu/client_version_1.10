@@ -250,16 +250,9 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
         let featureTable = null;
         let query = new Query();
         const highlightIds = [];
-        // if(pass.geometry){
-        //     query.geometry = new Polygon(pass.geometry);
-        //     query.spatialRelationship = pass.typeSelected;
-        //     query.outFields = ["*"];
-        //     query.returnGeometry = true;
-        // }
         const arrayGeometry = [];
         let geometry = null;
         if(pass.graphicsFound && typeof pass.valueBuffer === "number"){
-            // query.geometry = new Polygon(pass.geometry);
             const graphicsFound =  pass.graphicsFound();
             graphicsFound?.graphics.forEach(g=>{
                 // @ts-ignore
@@ -292,8 +285,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                     featureTable.filterGeometry = this.state.viewExtent;
                 },10)
             }
-            console.log(geometry,"check geometry")
-            // if (pass.geometry && filterValue === 2)featureTable.filterGeometry = pass.geometry;
             if (geometry && filterValue === 2)featureTable.filterGeometry = geometry;
             featureTable.filterBySelection();
             return featureTable;

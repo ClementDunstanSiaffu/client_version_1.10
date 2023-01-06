@@ -178,7 +178,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     const activeView = Widget.activeView;
     if (activeView){
         activeView?.selectFeaturesByGraphic(geometry,"contains").then((results)=>{
-            // helper.highlightOnlyCheckedLayer(checkedLayers);
             if (results?.length){
               helper.unhighlightLayer();
               Widget.selectedResults = results;
@@ -547,7 +546,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     if(arrayErrors.length === 0 && this.props.config.idWidgetTable !== ""){
 
       this.state.jimuMapView.view.map.allLayers.forEach((f, index) =>{
-        if(f && f.type==="feature" && this.state.listServices.indexOf(index) !== -1){
+        if(f && f.type==="feature" && checkedLayers.indexOf(f.id) !== -1){
           if(f.labelingInfo?.length){
             f.labelingInfo[0].symbol.font.family = "Arial";//fix font verdana not in static esri
             f.labelsVisible = this.state.labelVisible;
@@ -557,7 +556,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
       //mando layerid ad TableList
       const results = Widget.selectedResults;
-      const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
+      // const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
       const selectedLayersContents = helper.getSelectedContentsLayer(results,checkedLayers);
       const numberOfAttributes = helper.getNumberOfAttributes(selectedLayersContents);
       // const geometry = this.state.geometry.toJSON();
