@@ -624,7 +624,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                   </CalciteAccordionItem>
                   <CalciteAccordionItem icon-start="car" itemTitle="Opzione di ricerca">
                     <div className="container-fluid mt-3 mb-3">
-                      <div className="row">
+                      {filterValue === 2 && <div className="row">
                         <label className="w-100">
                           Valore di buffer <NumericInput defaultValue={this.state.valueBuffer} value={this.state.valueBuffer} onChange={this.onChangeSlider} className="d-inline-block w-50"/> m
                           <Slider
@@ -638,7 +638,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                               step={1}
                           />
                         </label>
-                      </div>
+                      </div>}
                       <div className="row mb-3">
                         <label className="w-100">
                           Tipo di selezione

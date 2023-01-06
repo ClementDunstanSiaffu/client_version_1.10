@@ -16,7 +16,8 @@ export default class SelectFilterType extends React.PureComponent<PropsType,any>
 
     onHandleChange = (item:{value:number,label:string})=>{
         const self = this.props.parent;
-        self.props.dispatch(appActions.widgetStatePropChange("value","filterValue",item.value))
+        self.props.dispatch(appActions.widgetStatePropChange("value","filterValue",item.value));
+        this.setState({open:false});
     }
 
     render(): React.ReactNode {
@@ -57,7 +58,7 @@ export default class SelectFilterType extends React.PureComponent<PropsType,any>
                                             <Checkbox
                                                 aria-label="Checkbox"
                                                 checked = {itemSelected}
-                                                // onChange={(e)=>this.handleClick(layer.id)}
+                                                onChange={()=>this.onHandleChange(filter)}
                                             />
                                         </div>
                                         <div className='flex-auto cursor-style' >

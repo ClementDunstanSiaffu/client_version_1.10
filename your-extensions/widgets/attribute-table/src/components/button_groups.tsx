@@ -149,9 +149,9 @@ export default class ButtonGroupComponent extends React.PureComponent<PropsType,
             </div>;
         }else{
             buttonFilter = <div>
-                <Button onClick={self?.optionFilterExtentions} size="default">
+                {this.props.filterValue === 1 && <Button onClick={self?.optionFilterExtentions} size="default">
                     <WidgetFilterOutlined/> Filtra per estenzione mappa
-                </Button>
+                </Button>}
                 {self?.props.config.buttonFilter && (<Button onClick={self?.optionOpenFilter} size="default">
                     <WidgetFilterOutlined/> Filtra
                 </Button>)}
