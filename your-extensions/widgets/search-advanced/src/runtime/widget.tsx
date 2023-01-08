@@ -522,25 +522,26 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
     Widget.foundGeometry = this.graphicLayerFound;
     //parametri form
-    let arrayGeometry = [];
+    // let arrayGeometry = [];
     //TODO PRENDERE GEOMETRIA
-    this.graphicLayerFound.graphics.forEach(g=>{
-      // @ts-ignore
-      g.geometry = geometryEngine.buffer(g.geometry, this.state.valueBuffer, "meters");
-      arrayGeometry.push(g.geometry);
-    });
+    // this.graphicLayerFound.graphics.forEach(g=>{
+    //   // @ts-ignore
+    //   g.geometry = geometryEngine.buffer(g.geometry, this.state.valueBuffer, "meters");
+    //   arrayGeometry.push(g.geometry);
+    // });
 
     //controllo errori
     let arrayErrors = [];
-    if(arrayGeometry.length) { // @ts-ignore
-      this.state.geometry = geometryEngine.union(arrayGeometry);
-    }
-    else arrayErrors.push("Seleziona una geometria in mappa");
+    // if(arrayGeometry.length) { // @ts-ignore
+    //   this.state.geometry = geometryEngine.union(arrayGeometry);
+    // }
+    // else arrayErrors.push("Seleziona una geometria in mappa");
     if(!checkedLayers.length) arrayErrors.push("Seleziona almeno un servizio");
     if(!this.state.typeSelected) arrayErrors.push("Seleziona una tipologia di selezione");
 
     this.setState({
-      errorMessage:arrayErrors.join()
+      errorMessage:arrayErrors.join(),
+      disableButton:true
     });
 
     if(arrayErrors.length === 0 && this.props.config.idWidgetTable !== ""){
@@ -578,7 +579,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         this.props.dispatch(appActions.widgetStatePropChange("value","showAlert",true));
         this.setState({errorMessage:"No item was selected"})
       }
-      this.setState({disableButton:true})
     }
   }
 

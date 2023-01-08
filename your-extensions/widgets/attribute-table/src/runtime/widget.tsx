@@ -253,6 +253,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
         const arrayGeometry = [];
         let geometry = null;
         if(pass.graphicsFound && typeof pass.valueBuffer === "number"){
+            console.log(pass.valueBuffer,"check buffer value")
             const graphicsFound =  pass.graphicsFound();
             graphicsFound?.graphics.forEach(g=>{
                 // @ts-ignore
