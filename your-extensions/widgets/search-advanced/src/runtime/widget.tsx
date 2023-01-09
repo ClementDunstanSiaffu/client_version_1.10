@@ -2,7 +2,7 @@
 import {React, AllWidgetProps, jsx, appActions, WidgetState, getAppStore,IMState} from 'jimu-core'
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
 import '../style.css'
-import {Tabs, Tab, Select, Option, Button, Alert, MultiSelect, NumericInput, Slider} from 'jimu-ui'
+import {Tabs, Tab, Select, Option, Button, Alert, MultiSelect, NumericInput, Slider, Loading} from 'jimu-ui'
 import { IMConfig } from '../config'
 import Query from 'esri/rest/support/Query'
 import query from 'esri/rest/query'
@@ -98,7 +98,9 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       typeSelected:null,
       listServices: [],
       searchByAddress:false,
-      disableButton:true
+      disableButton:true,
+      urlFetched:{"comuni":false,"sito":false,"ambito":false},
+      locatingPosition:{"status":false,"error":false}
     }
 
     this.activeViewChangeHandler = this.activeViewChangeHandler.bind(this);
@@ -266,11 +268,17 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       listComuni: [],
       listAmbiti: [],
       listSTO: [],
+      urlFetched:{"comuni":false,"sito":false,"ambito":false},
+      locatingPosition:{"status":false,"error":false}
+    },()=>{
+      this.populateComuni();
+      this.populateSTO();
+      this.populateAmbiti();
     });
 
-    this.populateComuni();
-    this.populateSTO();
-    this.populateAmbiti();
+    // this.populateComuni();
+    // this.populateSTO();
+    // this.populateAmbiti();
   }
 
   /**==============================================
@@ -288,8 +296,11 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     // results.features.sort(function (a, b) {
     //   return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1));
     // })
+    const copiedFectedUrl = {...this.state.urlFetched};
+    copiedFectedUrl["comuni"] = true;
     this.setState({
-      listComuni: results.features
+      listComuni: results.features,
+      urlFetched:copiedFectedUrl
     })
   }
 
@@ -376,23 +387,28 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
   }
 
+  setLocatingPostion(locatingStatus:boolean,errorStatus:boolean){
+    const copiedLocatingPosition = {...this.state.locatingPosition};
+    copiedLocatingPosition["status"] = locatingStatus;
+    copiedLocatingPosition["error"] = errorStatus;
+    this.setState({locatingPosition:copiedLocatingPosition});
+  }
+
   async onChangeSelectComuni (e) {
     this.graphicLayerFound.removeAll();
     const queryObject = new Query();
-    // queryObject.where = `OBJECTID = "${e.target.value}"`;
     queryObject.where = `OBJECTID = ${e.target.value}`;
     queryObject.returnGeometry = true;
     // @ts-expect-error
     queryObject.outFields = this.props.config.searchItems.outFields;
+    this.setLocatingPostion(true,false);
     try{
       const results = await query.executeQueryJSON(this.props.config.searchItems.url, queryObject);
       if(results && results.features?.length){
         const feature = results.features[0];
         let latitude,longitude,polygon;
         const geometry = feature?.geometry;
-        // let polygon = new Polygon(geometry);
         const type = geometry.type;
-        // let polygon = new Polygon(feature.geometry);
         //@ts-ignore
         if (geometry?.longitude && geometry?.latitude){
           //@ts-ignore
@@ -409,21 +425,9 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         }else{
           polygon = new Polygon(geometry);
         }
-        console.log(results,polygon,latitude,longitude,"check geometry")
   
-        // const polygonGraphic = new Graphic({
-        //   geometry: polygon,
-        //   symbol: this.symbolFound
-        // })
-
-        // const polygon = {
-        //   type: "point",
-        //   longitude: -71.2643,
-        //   latitude: 42.0909
-        // }
-
         let markerSymbol = {
-          type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+          type: "simple-marker", 
           color: [0, 0, 0,0.5],
           size:"100px",
           outline:{
@@ -432,23 +436,17 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
           }
         };
 
-        const polygonGraphic = new Graphic({
-          geometry: polygon,
-          symbol: markerSymbol
-        })
-  
+        const polygonGraphic = new Graphic({geometry: polygon,symbol: markerSymbol})
         this.graphicLayerFound.add(polygonGraphic);
         this.state.jimuMapView.view.graphics.add(polygonGraphic);
-  
-        this.state.jimuMapView.view.goTo({
-          center: polygonGraphic
-        });
-      
+        this.state.jimuMapView.view.goTo({center: polygonGraphic});
+        this.setLocatingPostion(false,false);      
       }else{
+        this.setLocatingPostion(false,true);
         console.log("Errore select comuni");
       }
     }catch(err){
-      console.log(err,"check cached error")
+      this.setLocatingPostion(false,true);
     }
  
   }
@@ -716,19 +714,51 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                 <div className="row">
                   <div className="col-md-12">
                     <div className="mb-2">
-                      {!this.state.listComuni.length &&<Alert className="w-100" form="basic" open text="Selezionare il comune" type="info" withIcon/>}
+                      {(!this.state.listComuni.length && this.state.urlFetched["comuni"]) &&
+                        <Alert className="w-100" form="basic" open text="Selezionare il comune" type="info" withIcon/>
+                      }
+                      {
+                        (!this.state.listComuni.length && !this.state.urlFetched["comuni"]) &&
+                        <div style={{height:'80px',position:'relative',width:'100%',marginLeft:"auto",marginRight:"auto"}}>
+                          <Loading />
+                        </div>
+                      }
                     </div>
                     <div className="mb-2">
-                      {this.state.listComuni.length &&<Select className="w-100" onChange={this.onChangeSelectComuni} placeholder="Seleziona un comune">
-                        {this.state.listComuni.map((el, i) => {
-                          console.log(el.attributes.OBJECTID,"object id")
-                          return <Option value={el.attributes.OBJECTID}>
-                            {el.attributes[Object.keys(el.attributes)[1]]}
-                            {/*it requires vpn to work */}
-                            {/* {el.attributes.NOMECOMUNE} */}
-                          </Option>
-                        })}
-                      </Select>}
+                      {
+                        this.state.listComuni.length > 0 &&
+                          <Select className="w-100" onChange={this.onChangeSelectComuni} placeholder="Seleziona un comune">
+                            {this.state.listComuni.map((el, i) => {
+                              return <Option value={el.attributes.OBJECTID}>
+                                {el.attributes[Object.keys(el.attributes)[1]]}
+                                {/*it requires vpn to work */}
+                                {/* {el.attributes.NOMECOMUNE} */}
+                              </Option>
+                            })}
+                          </Select>
+                      }
+                      {
+                        this.state.locatingPosition["status"] && !this.state.locatingPosition["error"] &&
+                        (
+                          <div style={{width:"100%",display:"flex",flexDirection:"column",justifyContent:"center",height:"auto"}}>
+                            <div style={{height:'80px',position:'relative',width:'100%',marginLeft:"auto",marginRight:"auto"}}>
+                              <Loading />
+                            </div>
+                            <div style = {{fontSize:14,color:"grey",width:'100%',textAlign:"center"}}>
+                              Locating position on the map....
+                            </div>
+                          </div>
+                        )
+                      }
+                      {
+                        !this.state.locatingPosition["status"] && this.state.locatingPosition["error"] && 
+                        <AlertComponent 
+                          open = {!this.state.locatingPosition["status"] && this.state.locatingPosition["error"] !== ""  ?true:false}
+                          text = {"Failed to locate position"}
+                          type = "error"
+                          onClose={()=>this.setLocatingPostion(false,false)}
+                        />
+                      }
                     </div>
                   </div>
                 </div>
