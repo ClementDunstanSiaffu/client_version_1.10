@@ -113,21 +113,21 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     this.populateComuni();
     this.onChangeSelectComuni = this.onChangeSelectComuni.bind(this);
 
-    //STO
-    this.populateSTO();
-    this.onClickViewTable = this.onClickViewTable.bind(this);
-    this.onChangeSelectSTO = this.onChangeSelectSTO.bind(this);
+    // //STO
+    // this.populateSTO();
+    // this.onClickViewTable = this.onClickViewTable.bind(this);
+    // this.onChangeSelectSTO = this.onChangeSelectSTO.bind(this);
 
-    //AMBITI
-    this.populateAmbiti();
-    this.onChangeSelectAmbiti = this.onChangeSelectAmbiti.bind(this);
+    // //AMBITI
+    // this.populateAmbiti();
+    // this.onChangeSelectAmbiti = this.onChangeSelectAmbiti.bind(this);
 
     this.onChangeTabs = this.onChangeTabs.bind(this);
     this.getAllCheckedLayers = this.getAllCheckedLayers.bind(this);
   }
 
   componentDidMount(): void {
-      this.props.dispatch(appActions.widgetStatePropChange("value","filterValue",2));
+    this.props.dispatch(appActions.widgetStatePropChange("value","filterValue",2));
   }
 
   componentDidUpdate() {
@@ -284,9 +284,10 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     // @ts-expect-error
     queryObject.outFields = this.props.config.searchItems.outFields;
     const results = await query.executeQueryJSON(this.props.config.searchItems.url, queryObject);
-    results.features.sort(function (a, b) {
-      return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1));
-    })
+    //--- it requires vpn ---//
+    // results.features.sort(function (a, b) {
+    //   return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1));
+    // })
     this.setState({
       listComuni: results.features
     })
@@ -378,28 +379,78 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   async onChangeSelectComuni (e) {
     this.graphicLayerFound.removeAll();
     const queryObject = new Query();
-    queryObject.where = `OBJECTID = "${e.target.value}"`;
+    // queryObject.where = `OBJECTID = "${e.target.value}"`;
+    queryObject.where = `OBJECTID = ${e.target.value}`;
     queryObject.returnGeometry = true;
     // @ts-expect-error
     queryObject.outFields = this.props.config.searchItems.outFields;
-    const results = await query.executeQueryJSON(this.props.config.searchItems.url, queryObject);
-    if(results && results.features?.length){
-      const feature = results.features[0];
-      const polygon = new Polygon(feature.geometry)
+    try{
+      const results = await query.executeQueryJSON(this.props.config.searchItems.url, queryObject);
+      if(results && results.features?.length){
+        const feature = results.features[0];
+        let latitude,longitude,polygon;
+        const geometry = feature?.geometry;
+        // let polygon = new Polygon(geometry);
+        const type = geometry.type;
+        // let polygon = new Polygon(feature.geometry);
+        //@ts-ignore
+        if (geometry?.longitude && geometry?.latitude){
+          //@ts-ignore
+          latitude = geometry.latitude;
+           //@ts-ignore
+          longitude = geometry.longitude;
+        }
+        if (longitude && latitude){
+          polygon = {
+            type:type,
+            longitude:longitude,
+            latitude: latitude
+          }
+        }else{
+          polygon = new Polygon(geometry);
+        }
+        console.log(results,polygon,latitude,longitude,"check geometry")
+  
+        // const polygonGraphic = new Graphic({
+        //   geometry: polygon,
+        //   symbol: this.symbolFound
+        // })
 
-      const polygonGraphic = new Graphic({
-        geometry: polygon,
-        symbol: this.symbolFound
-      })
+        // const polygon = {
+        //   type: "point",
+        //   longitude: -71.2643,
+        //   latitude: 42.0909
+        // }
 
-      this.graphicLayerFound.add(polygonGraphic);
+        let markerSymbol = {
+          type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+          color: [0, 0, 0,0.5],
+          size:"100px",
+          outline:{
+            color:"transparent",
+            width:0
+          }
+        };
 
-      this.state.jimuMapView.view.goTo({
-        center: polygonGraphic
-      });
-    }else{
-      console.log("Errore select comuni");
+        const polygonGraphic = new Graphic({
+          geometry: polygon,
+          symbol: markerSymbol
+        })
+  
+        this.graphicLayerFound.add(polygonGraphic);
+        this.state.jimuMapView.view.graphics.add(polygonGraphic);
+  
+        this.state.jimuMapView.view.goTo({
+          center: polygonGraphic
+        });
+      
+      }else{
+        console.log("Errore select comuni");
+      }
+    }catch(err){
+      console.log(err,"check cached error")
     }
+ 
   }
 
   async onChangeSelectSTO (e) {
@@ -665,16 +716,19 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                 <div className="row">
                   <div className="col-md-12">
                     <div className="mb-2">
-                      <Alert className="w-100" form="basic" open text="Selezionare il comune" type="info" withIcon/>
+                      {!this.state.listComuni.length &&<Alert className="w-100" form="basic" open text="Selezionare il comune" type="info" withIcon/>}
                     </div>
                     <div className="mb-2">
-                      <Select className="w-100" onChange={this.onChangeSelectComuni} placeholder="Seleziona un comune">
+                      {this.state.listComuni.length &&<Select className="w-100" onChange={this.onChangeSelectComuni} placeholder="Seleziona un comune">
                         {this.state.listComuni.map((el, i) => {
+                          console.log(el.attributes.OBJECTID,"object id")
                           return <Option value={el.attributes.OBJECTID}>
-                            {el.attributes.NOMECOMUNE}
+                            {el.attributes[Object.keys(el.attributes)[1]]}
+                            {/*it requires vpn to work */}
+                            {/* {el.attributes.NOMECOMUNE} */}
                           </Option>
                         })}
-                      </Select>
+                      </Select>}
                     </div>
                   </div>
                 </div>
