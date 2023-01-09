@@ -520,7 +520,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   async onClickResearch(){
     this.state.jimuMapView.view.map.tables.removeAll();
     const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
-    Widget.foundGeometry = this.graphicLayerFound;
+    // Widget.foundGeometry = this.graphicLayerFound;
     //parametri form
     // let arrayGeometry = [];
     //TODO PRENDERE GEOMETRIA
@@ -543,6 +543,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       errorMessage:arrayErrors.join(),
       disableButton:true
     });
+    Widget.foundGeometry = this.graphicLayerFound;
 
     if(arrayErrors.length === 0 && this.props.config.idWidgetTable !== ""){
 
