@@ -520,22 +520,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   async onClickResearch(){
     this.state.jimuMapView.view.map.tables.removeAll();
     const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
-    // Widget.foundGeometry = this.graphicLayerFound;
-    //parametri form
-    // let arrayGeometry = [];
-    //TODO PRENDERE GEOMETRIA
-    // this.graphicLayerFound.graphics.forEach(g=>{
-    //   // @ts-ignore
-    //   g.geometry = geometryEngine.buffer(g.geometry, this.state.valueBuffer, "meters");
-    //   arrayGeometry.push(g.geometry);
-    // });
-
-    //controllo errori
     let arrayErrors = [];
-    // if(arrayGeometry.length) { // @ts-ignore
-    //   this.state.geometry = geometryEngine.union(arrayGeometry);
-    // }
-    // else arrayErrors.push("Seleziona una geometria in mappa");
     if(!checkedLayers.length) arrayErrors.push("Seleziona almeno un servizio");
     if(!this.state.typeSelected) arrayErrors.push("Seleziona una tipologia di selezione");
 
@@ -558,10 +543,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
       //mando layerid ad TableList
       const results = Widget.selectedResults;
-      // const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
       const selectedLayersContents = helper.getSelectedContentsLayer(results,checkedLayers);
       const numberOfAttributes = helper.getNumberOfAttributes(selectedLayersContents);
-      // const geometry = this.state.geometry.toJSON();
       const geometry = this.state.geometry;
       const layerOpen = {
         geometry:geometry,

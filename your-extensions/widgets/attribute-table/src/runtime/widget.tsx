@@ -10,31 +10,7 @@ import Query from 'esri/rest/support/Query';
 import FeatureTable from 'esri/widgets/FeatureTable';
 import defaultMessages from './translations/default';
 import geometryEngine from "esri/geometry/geometryEngine";
-
-
-type spatialRelationshipType = "intersects" | "contains" | "crosses" | "disjoint" | "envelope-intersects" | "index-intersects" | "overlaps" | "touches" | "within" | "relation"
-
-type stateValueType = {
-    stateValue:{
-        value:{
-            getAllLayers:()=>any,
-            layerOpen:{
-                geometry:any,
-                typeSelected:spatialRelationshipType,
-                where?:string,
-                graphicsFound?:any,
-                valueBuffer?:any
-            },
-            getActiveView:()=>any,
-            getAllJimuLayerViews:()=>any,
-            checkedLayers:string[],
-            numberOfAttribute:{[id:string]:number},
-            createTable:boolean,
-            initialMapZoom:any,
-            filterValue:number
-        }
-    }
-}
+import { stateValueType,spatialRelationshipType} from '../types/type';
 
 export default class Widget extends React.PureComponent<AllWidgetProps<any>&stateValueType, any> {
 
@@ -107,7 +83,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
         return this.props.intl ? this.props.intl.formatMessage({ id: id, defaultMessage: defaultMessages[id] }) : id
     }
 
-  
     createListTable(){
         const allLayers = this.props.stateValue?.value?.getAllLayers()??[];
         const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
@@ -153,12 +128,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                 }
             }
         }
-        this.setState({
-            geometryFilter: layerOpen.geometry,
-            listServices:checkedLayers,
-            tabs:tabs
-        });
-   
+        this.setState({geometryFilter: layerOpen.geometry,listServices:checkedLayers,tabs:tabs});
     }
     
     createFeatureTable(layer,highlightIds:any){
@@ -212,9 +182,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                         query.returnGeometry = true;
                         layer.queryFeatures(query).then((results)=>{
                             const features = results.features;
-                            if(features.length){
-                                activeView.view.goTo(features[0].geometry);
-                            }
+                            if(features.length)activeView.view.goTo(features[0].geometry)
                         });
                     }
                     }catch (e){
@@ -224,7 +192,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                 const view = activeView.view;
                 view.goTo({center: view.center,zoom:initialMapZoom });
             }
-
         });
         reactiveUtils.when(()=>view.stationary,()=>{
             let filterByExtention = true;
@@ -253,7 +220,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
         const arrayGeometry = [];
         let geometry = null;
         if(pass.graphicsFound && typeof pass.valueBuffer === "number"){
-            console.log(pass.valueBuffer,"check buffer value")
             const graphicsFound =  pass.graphicsFound();
             graphicsFound?.graphics.forEach(g=>{
                 // @ts-ignore
@@ -350,10 +316,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                 arrayTable.splice(tableIndex,1);
             }
     
-            this.setState({
-                tabsLength:tabs.length,
-                tabs:copiedTabs
-            });
+            this.setState({tabsLength:tabs.length,tabs:copiedTabs});
         }
     }
 
@@ -419,12 +382,9 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
         const uniqueValuesInfosSave = this.uniqueValuesInfosSave;
         const saveOldRenderer = this.saveOldRenderer;
         const jimuLayerViews = this.props.stateValue.value.getAllJimuLayerViews();
-
         if(activeTable && jimuLayerViews){
             let arrayItemSelected = activeTable.highlightIds
-        
             if(arrayItemSelected){
-
                 const keys = Object.keys(jimuLayerViews)
                 if (keys.length){
                     keys.forEach((key)=>{
@@ -482,9 +442,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                 }
             }
         }
-        if (event){
-            this.setState({selectedColor:event});
-        }
+        if (event)this.setState({selectedColor:event})
     }
 
     optionColorCleanSelected(cleanHighLightIds = true){
