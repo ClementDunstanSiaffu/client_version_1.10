@@ -27,7 +27,7 @@ function Table (props) {
       <table style={{width:"100%"}}>
         <caption></caption>
         <thead>
-          {/*require the correct map from where-tech */}
+          {/*TODO */}
           {/* <tr>
             <th>Comune</th>
             <th>Codice Istat</th>
@@ -51,12 +51,13 @@ function Table (props) {
               </tr>
             )})
           }
-        {/* {list.map((sto, i) => (
-            <tr className="item-row" key={i}>
-              <td className="item-table" id={sto.attributes.OBJECTID} onClick={handleClick}>{sto.attributes.NOMECOMUNE}</td>
-              <td className="item-table" id={sto.attributes.OBJECTID} onClick={handleClick}>{sto.attributes.ISTAT}</td>
-            </tr>
-        ))} */}
+          {/* TODO */}
+          {/* {list.map((sto, i) => (
+              <tr className="item-row" key={i}>
+                <td className="item-table" id={sto.attributes.OBJECTID} onClick={handleClick}>{sto.attributes.NOMECOMUNE}</td>
+                <td className="item-table" id={sto.attributes.OBJECTID} onClick={handleClick}>{sto.attributes.ISTAT}</td>
+              </tr>
+          ))} */}
         </tbody>
       </table>
     )
@@ -199,7 +200,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   }
 
   selectFeatureLayer = (geometry:any)=>{
-    const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
     const activeView = Widget.activeView;
     if (activeView){
         activeView?.selectFeaturesByGraphic(geometry,"contains").then((results)=>{
@@ -297,10 +297,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       this.populateSTO();
       this.populateAmbiti();
     });
-
-    // this.populateComuni();
-    // this.populateSTO();
-    // this.populateAmbiti();
   }
 
   updateFetchStatus (key:string,bool:boolean){
@@ -320,16 +316,12 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     // @ts-expect-error
     queryObject.outFields = this.props.config.searchItems.outFields;
     const results = await query.executeQueryJSON(this.props.config.searchItems.url, queryObject);
-    //--- it requires vpn ---//
+    //--- TODO ---//
     // results.features.sort(function (a, b) {
     //   return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1));
     // })
-    // const copiedFectedUrl = {...this.state.urlFetched};
-    // copiedFectedUrl["comuni"] = true;
-    this.setState({
-      listComuni: results.features,
-      // urlFetched:copiedFectedUrl
-    })
+ 
+    this.setState({listComuni: results.features,})
     this.updateFetchStatus("comuni",true)
   }
 
@@ -397,16 +389,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         polygon = new Polygon(geometry);
       }
 
-      let markerSymbol = {
-        type: "simple-marker", 
-        color: [0, 0, 0,0.5],
-        size:"100px",
-        outline:{
-          color:"transparent",
-          width:0
-        }
-      };
-
       for(let i=0;i<results.fields.length;i++){
         let itemField = results.fields[i];
         arrayFieldsContentPopupTemplate.push({fieldName: itemField.name,label: itemField.alias})
@@ -424,42 +406,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       this.graphicLayerSelected.add(polygonGraphic);
       this.state.jimuMapView.view.goTo({center: polygonGraphic});
       this.state.jimuMapView.view.popup.open({location:polygon,features:[polygonGraphic]});
-      // this.state.jimuMapView.view.popup.open({features: [polygonGraphic],location: polygon.centroid});
-
-      // const polygon = new Polygon(feature.geometry);
-      // let arrayFieldsContentPopupTemplate = []
-      // for(let i=0;i<results.fields.length;i++){
-      //   let itemField = results.fields[i];
-      //   arrayFieldsContentPopupTemplate.push({
-      //     fieldName: itemField.name,
-      //     label: itemField.alias
-      //   })
-      // }
-
-      // const polygonGraphic = new Graphic({
-      //   geometry: polygon,
-      //   popupTemplate:{
-      //     title:"Feature selezionata",
-      //     content:[{
-      //       type:"fields",
-      //       fieldInfos:arrayFieldsContentPopupTemplate
-      //     }]
-      //   },
-      //   attributes:feature.attributes,
-      //   symbol: this.symbolSelected
-      // });
-
-      // this.graphicLayerSelected.add(polygonGraphic);
-
-      // this.state.jimuMapView.view.goTo({
-      //   center: polygonGraphic
-      // });
-
-
-      // this.state.jimuMapView.view.popup.open({
-      //   features: [polygonGraphic],
-      //   location: polygon.centroid
-      // });
     }else{
       console.log("Errore view STO")
     }
@@ -517,7 +463,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
         const polygonGraphic = new Graphic({geometry: polygon,symbol: markerSymbol})
         this.graphicLayerFound.add(polygonGraphic);
-        this.state.jimuMapView.view.graphics.add(polygonGraphic);
+        // this.state.jimuMapView.view.graphics.add(polygonGraphic); --- adding new symboly on the current map
         this.state.jimuMapView.view.goTo({center: polygonGraphic});
         this.setLocatingPostion(false,false);      
       }else{
@@ -531,16 +477,16 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   }
 
   async onChangeSelectSTO (e) {
-    console.log("check the value of e")
     this.graphicLayerFound.removeAll();
     const queryObject = new Query();
+    //TODO
     // queryObject.where = `IDCOMPARTIMENTO = "${e.target.value}"`;
     queryObject.where = `OBJECTID = ${e.target.value}`;
     queryObject.returnGeometry = true;
     // @ts-expect-error
     queryObject.outFields = '*';
     const results = await query.executeQueryJSON(this.props.config.searchItems.url, queryObject);
-      //--- it requires vpn ---//
+      //---TODO ---//
     // results.features.sort(function (a, b) {
     //   return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1));
     // })
@@ -581,33 +527,9 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       })
       if (totalpolygonGraphic.length){
         this.state.jimuMapView.view.goTo({center:totalpolygonGraphic});
-        // this.state.jimuMapView.view.goTo({center:[totalpolygonGraphic]})
       }
       this.setState({resultSTO:feature})
     }
-
-    // const totalpolygonGraphic = []
-    // results.features.forEach((el, i) => {
-    //   const geometryComune = el.geometry;
-    //   const polygon = new Polygon(geometryComune);
-    //   const polygonGraphic = new Graphic({
-    //     geometry: polygon,
-    //     symbol: this.symbolFound
-    //   })
-
-    //   this.graphicLayerFound.add(polygonGraphic);
-    //   totalpolygonGraphic.push(polygonGraphic);
-    // })
-
-    // if(totalpolygonGraphic?.length){
-    //   this.state.jimuMapView.view.goTo({
-    //     center: [totalpolygonGraphic]
-    //   })
-    // }
-
-    // this.setState({
-    //   resultSTO: results.features
-    // })
   }
 
   async onChangeSelectAmbiti (e) {
@@ -633,13 +555,9 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       totalpolygonGraphic.push(polygonGraphic);
     })
 
-    this.state.jimuMapView.view.goTo({
-      center: [totalpolygonGraphic]
-    })
+    this.state.jimuMapView.view.goTo({center: [totalpolygonGraphic]})
 
-    this.setState({
-      resultsAmbiti: results.features
-    })
+    this.setState({resultsAmbiti: results.features})
   }
 
 
@@ -814,9 +732,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                   </CalciteAccordionItem>
                   <CalciteAccordionItem icon-start="car" itemTitle ="Select filter type">
                     <div className="container-fluid mt-3 mb-3">
-                      {/* <div className="row"> */}
                         <SelectFilterType parent = {this} filterValue = {filterValue} />
-                      {/* </div> */}
                     </div>
                   </CalciteAccordionItem>
                 </CalciteAccordion>
@@ -854,7 +770,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                             {this.state.listComuni.map((el, i) => {
                               return <Option value={el.attributes.OBJECTID}>
                                 {el.attributes[Object.keys(el.attributes)[1]]}
-                                {/*it requires vpn to work */}
+                                {/*TODO -it requires vpn to work */}
                                 {/* {el.attributes.NOMECOMUNE} */}
                               </Option>
                             })}
@@ -901,7 +817,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                           <Loading />
                         </div>
                     }
-                      {/* <Alert className="w-100" form="basic" open text="Selezionare prima lo STO, poi fare click sul comune per evidenziarlo." type="info" withIcon/> */}
                     </div>
                     <div className="mb-2">
                       {
@@ -912,14 +827,11 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                               return<Option value={el.attributes.OBJECTID}>
                                       {el.attributes[Object.keys(el.attributes)[1]]}
                                     </Option>
-                              //it requires where-tech map with the required field
-                              // return<Option value={el.attributes.IDCOMPARTIMENTO}>
-                              //        {el.attributes[Object.keys(el.attributes)[1]]}
-                              //         {/*it requires vpn to work */}
-                              //         {/* {el.attributes.NOMECOMPARTIMENTO} */}
-                              //       </Option>
-                                  
-                            })
+                                    //TODO - it requires where-tech map with the required field
+                                    // return<Option value={el.attributes.IDCOMPARTIMENTO}>
+                                    //         {/* {el.attributes.NOMECOMPARTIMENTO} */}
+                                    //       </Option>
+                                  })
                           }
                         </Select>
                       }

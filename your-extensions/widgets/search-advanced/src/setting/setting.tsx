@@ -29,10 +29,6 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<a
       id: this.props.id,
       config: this.props.config.set(val,newObject)
     }); 
-    // this.props.onSettingChange({
-    //   id: this.props.id,
-    //   config: this.props.config.set(key, value)
-    // });
   }
 
   onChangeHandler(e:ChangeEvent){
