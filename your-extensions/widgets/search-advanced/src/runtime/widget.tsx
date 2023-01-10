@@ -604,23 +604,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         this.setLocatingPostion(false,true);
       }
 
-
-
-    // const totalpolygonGraphic = [];
-    // results.features.forEach((el, i) => {
-    //   const geometryComune = el.geometry;
-    //   const polygon = new Polygon(geometryComune);
-    //   const polygonGraphic = new Graphic({
-    //     geometry: polygon,
-    //     symbol: this.symbolFound
-    //   })
-    //   this.graphicLayerFound.add(polygonGraphic);
-    //   totalpolygonGraphic.push(polygonGraphic);
-    // })
-
-    // this.state.jimuMapView.view.goTo({center: [totalpolygonGraphic]})
-
-    // this.setState({resultsAmbiti: results.features})
   }
 
 
@@ -840,19 +823,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                           </Select>
                       }
                       <LocatingPositionLoader locatingPosition={this.state.locatingPosition}/>
-                      {/* {
-                        this.state.locatingPosition["status"] && !this.state.locatingPosition["error"] &&
-                        (
-                          <div style={{width:"100%",display:"flex",flexDirection:"column",justifyContent:"center",height:"auto"}}>
-                            <div style={{height:'80px',position:'relative',width:'100%',marginLeft:"auto",marginRight:"auto"}}>
-                              <Loading />
-                            </div>
-                            <div style = {{fontSize:14,color:"grey",width:'100%',textAlign:"center"}}>
-                              Locating position on the map....
-                            </div>
-                          </div>
-                        )
-                      } */}
                       {
                         !this.state.locatingPosition["status"] && this.state.locatingPosition["error"] && 
                         <AlertComponent 
