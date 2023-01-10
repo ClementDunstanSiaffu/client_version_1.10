@@ -18,6 +18,7 @@ import IndrizzoTab from '../components/tabs/indrizzo_tab'
 import ComuniTab from '../components/tabs/comuni_tab'
 import SitoTab from '../components/tabs/sito_tab'
 import AmbitoTab from '../components/tabs/ambito_tab'
+import defaultMessages from './translations/default'
 
 type stateValueType = {stateValue:{value:{checkedLayers:string[],filterValue:number}}}
 
@@ -120,8 +121,10 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     return activeView;
   }
 
-  getFoundGeometryArray = ()=>{
-    return Widget.foundGeometry;
+  getFoundGeometryArray = ()=>Widget.foundGeometry;
+
+  nls = (id: string) => {
+    return this.props.intl ? this.props.intl.formatMessage({ id: id, defaultMessage: defaultMessages[id] }) : id
   }
 
   getAllCheckedLayers = ()=>{
@@ -348,10 +351,10 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
               <JimuMapViewComponent useMapWidgetId={this.props.useMapWidgetIds?.[0]} onActiveViewChange={this.activeViewChangeHandler} />
           )}
           <Tabs defaultValue="search-advanced-tab-indirizzi" type="tabs" onChange={this.onChangeTabs}>
-            <Tab id="search-advanced-tab-indirizzi" title="Indirizzi"><IndrizzoTab /></Tab>
-            <Tab id="search-advanced-tab-comuni" title="Comuni"><ComuniTab /></Tab>
-            <Tab id="search-advanced-tab-sito" title="Sito"><SitoTab /></Tab>
-            <Tab id="search-advanced-tab-Ambito" title="Ambito"><AmbitoTab /></Tab>
+            <Tab id="search-advanced-tab-indirizzi" title = {this.nls("addresses")}><IndrizzoTab /></Tab>
+            <Tab id="search-advanced-tab-comuni" title = {this.nls("municipalities")}><ComuniTab /></Tab>
+            <Tab id="search-advanced-tab-sito" title = {this.nls("site")}><SitoTab /></Tab>
+            <Tab id="search-advanced-tab-Ambito" title = {this.nls("scope")}><AmbitoTab /></Tab>
           </Tabs>
         </div>
         </SearchWidgetContext.Provider>

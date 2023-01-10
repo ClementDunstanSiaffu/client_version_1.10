@@ -20,6 +20,11 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
         this.onChangeSlider = this.onChangeSlider.bind(this)
     }
 
+    nls = (id:string)=>{
+        const searchWidget = this.context?.parent;
+        return searchWidget.nls(id);
+    }
+
     onChangeSelectLayer (e,n,s){
 
         const searchWidget = this.context?.parent;
@@ -69,7 +74,7 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
       }
 
     onClickResearch(){
-        
+
         const jimuMapView = this.context?.jimuMapView;
         const checkedLayers = this.context?.checkedLayers??[];
         const searchWidget = this.context?.parent;
@@ -121,7 +126,7 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
             searchWidget.setState({errorMessage:"No item was selected"})
           }
         }
-      }
+    }
 
     render(): React.ReactNode {
 
@@ -137,39 +142,39 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
             <div>
                 <CalciteAccordion className="mt-4 mb-2">
                         
-                    <CalciteAccordionItem active={true} itemTitle="Seleziona indirizzo">
+                    <CalciteAccordionItem active={true} itemTitle = {this.nls("selectAddress")}>
                         <div className="container-fluid mt-3 mb-3">
                             <div className="row">
-                                <label>Ricerca per indirizzo</label>
+                                <label>{this.nls("searchByAddress")}</label>
                                 <div id="search-widget-search-advanced" className="w-100"></div>
                             </div>
                             <div className="row mt-2">
-                                <label>Ricerca per geometria</label>
+                                <label>{this.nls("searchByGeometry")}</label>
                                 <div id="sketch-widget-search-advanced" className="w-100"></div>
                             </div>
                         </div>
                     </CalciteAccordionItem>
 
-                    <CalciteAccordionItem icon-start="car" itemTitle="Seleziona layers da interrogare">
+                    <CalciteAccordionItem icon-start="car" itemTitle = {this.nls("selectLayerQuery")}>
                         <div className="container-fluid mt-3 mb-3">
                             <div className="row">
-                                <label>Layer selezionati: {checkedLayers.length} / {arrayLayer.length}</label>
+                                <label>{this.nls("selectedLayers")}: {checkedLayers.length} / {arrayLayer.length}</label>
                                 <MultiSelect
                                     items={arrayLayer}
                                     onClickItem={this.onChangeSelectLayer}
-                                    placeholder="Lista servizi"
+                                    placeholder={this.nls("listServices")}
                                     values = {checkedLayers}
                                 />
                             </div>
                         </div>
                     </CalciteAccordionItem>
 
-                    <CalciteAccordionItem icon-start="car" itemTitle="Opzione di ricerca">
+                    <CalciteAccordionItem icon-start="car" itemTitle = {this.nls("researchOption")}>
                         <div className="container-fluid mt-3 mb-3">
                             {filterValue === 2 && 
                                 <div className="row">
                                     <label className="w-100">
-                                        Valore di buffer <NumericInput defaultValue={valueBuffer} value={valueBuffer} onChange={this.onChangeSlider} className="d-inline-block w-50"/> m
+                                        {this.nls("bufferValue")} <NumericInput defaultValue={valueBuffer} value={valueBuffer} onChange={this.onChangeSlider} className="d-inline-block w-50"/> m
                                         <Slider
                                             className="w-100 mt-1"
                                             aria-label="Range"
@@ -184,8 +189,8 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
                                 </div>}
                                 <div className="row mb-3">
                                     <label className="w-100">
-                                        Tipo di selezione
-                                        <Select className="w-100 mt-2" onChange={this.onChangeSelectTypeGeometry} placeholder="Selezione tipo...">
+                                        {this.nls("typeOfSelection")}
+                                        <Select className="w-100 mt-2" onChange={this.onChangeSelectTypeGeometry} placeholder = {this.nls("typeSelection")}>
                                             <Option value="intersects" selected="selected">Intersects</Option>
                                             <Option value="contains">Contains</Option>
                                             <Option value="crosses">Crosses</Option>
@@ -201,7 +206,7 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
                         </div>
                     </CalciteAccordionItem>
 
-                    <CalciteAccordionItem icon-start="car" itemTitle ="Select filter type">
+                    <CalciteAccordionItem icon-start="car" itemTitle = {this.nls("selectFilterType")}>
                         <div className="container-fluid mt-3 mb-3">
                             <SelectFilterType parent = {searchWidget} filterValue = {filterValue} />
                         </div>
@@ -210,7 +215,7 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
                 </CalciteAccordion>
 
                 <Button type= {disableButton ?"secondary" :"primary"} className="w-100" onClick={this.onClickResearch} disabled = {disableButton}>
-                    Ricerca nei layer
+                    {this.nls("searchInLayers")}
                 </Button>
                     
                 <Alert 

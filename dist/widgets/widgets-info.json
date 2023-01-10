@@ -6705,6 +6705,7 @@
       "license": "",
       "properties": {},
       "translatedLocales": [
+        "it",
         "en"
       ],
       "defaultSize": {
@@ -6712,8 +6713,14 @@
         "height": 800
       }
     },
-    "i18nLabel": {},
-    "i18nDescription": {},
+    "i18nLabel": {
+      "it": "Ricerca avanzata",
+      "en": "Search Widget"
+    },
+    "i18nDescription": {
+      "it": null,
+      "en": null
+    },
     "uri": "widgets/search-advanced/",
     "icon": "widgets/search-advanced/icon.svg",
     "order": 700,

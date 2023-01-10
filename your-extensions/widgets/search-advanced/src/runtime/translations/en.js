@@ -1,0 +1,27 @@
+System.register([], function (_export) {return {execute: function () {_export({
+    _widgetLabel:"Search Widget",
+    "addresses":"Addresses",
+    "municipalities":"Municipalities",
+    "site":"Site",
+    "scope":"Scope",
+    "selectAddress":"Select address",
+    "searchByAddress":"Search by address",
+    "searchByGeometry":"Search by geometry",
+    "selectLayerQuery":"Select layers to query",
+    "selectedLayers":"Selected layers",
+    "listServices":"List of services",
+    "researchOption":"Research option",
+    "bufferValue":"Buffer value",
+    "typeOfSelection":"Type of selection",
+    "typeSelection":"Type selection...",
+    "selectFilterType":"Select filter type",
+    "searchInLayers":"Search in layers",
+    "selectTheMunicipality":"Select the municipality",
+    "selectAMunicipality":"Select a municipality",
+    "failedToLocatePosition":"Failed to locate position",
+    "siteALert":"Select the STO first, then click on the municipality to highlight it.",
+    "scopeAlert":"Select the scope first, then click on the municipality to highlight it",
+    "filterByExtention":"Filter by extention",
+    "filterByValueBuffer":"Filter by value buffer"
+})}}});
+

@@ -17,6 +17,12 @@ export default class SelectFilterType extends React.PureComponent<PropsType,any>
         this.onHandleChange = this.onHandleChange.bind(this);
     }
 
+
+    nls = (id:string)=>{
+        const searchWidget = this.props.parent;
+        return searchWidget.nls(id);
+    }
+
     onHandleChange = (item:{value:number,label:string})=>{
         const self = this.props.parent;
         self.props.dispatch(appActions.widgetStatePropChange("value","filterValue",item.value));
@@ -27,7 +33,10 @@ export default class SelectFilterType extends React.PureComponent<PropsType,any>
 
     render(): React.ReactNode {
 
-        const filters = [{label:"Filter by extention",value:1},{label:"Filter by value buffer",value:2}]
+        const filterByExtention = this.nls("filterByExtention");
+        const filterByValueBuffer = this.nls("filterByValueBuffer")
+
+        const filters = [{label:filterByExtention,value:1},{label:filterByValueBuffer,value:2}]
 
         const selectedItem = (value)=>{
             const val = this.props.filterValue

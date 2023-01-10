@@ -19,6 +19,11 @@ export default class AmbitoTab extends React.PureComponent<any,any>{
         this.onChangeSelectAmbiti = this.onChangeSelectAmbiti.bind(this);
     }
 
+    nls = (id:string)=>{
+        const searchWidget = this.context?.parent;
+        return searchWidget.nls(id);
+    }
+
     async onChangeSelectAmbiti (e) {
 
 
@@ -88,7 +93,7 @@ export default class AmbitoTab extends React.PureComponent<any,any>{
                 <div className="mb-2">
                   {
                     (!listAmbiti.length && urlFetched["ambito"]) && 
-                    <Alert className="w-100" form="basic" open text="Selezionare prima l'ambito, poi fare click sul comune per evidenziarlo" type="info" withIcon/>
+                    <Alert className="w-100" form="basic" open text={this.nls("scopeAlert")} type="info" withIcon/>
                   }
                   {
                     (!listAmbiti.length && !urlFetched["ambito"]) && 
@@ -114,7 +119,7 @@ export default class AmbitoTab extends React.PureComponent<any,any>{
                     !locatingPosition["status"] && locatingPosition["error"] && 
                         <Alert 
                             open = {!locatingPosition["status"] && locatingPosition["error"]  ?true:false}
-                            text = {"Failed to locate position"}
+                            text = {this.nls("failedToLocatePosition")}
                             type = "error"
                             onClose={()=>searchWidget.setLocatingPostion(false,false)}
                         />

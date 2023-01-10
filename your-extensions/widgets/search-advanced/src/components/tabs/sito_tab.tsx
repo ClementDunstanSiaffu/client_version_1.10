@@ -19,6 +19,11 @@ export default class SitoTab extends React.PureComponent<any,any>{
         this.onChangeSelectSTO = this.onChangeSelectSTO.bind(this);
     }
 
+    nls = (id:string)=>{
+        const searchWidget = this.context?.parent;
+        return searchWidget.nls(id);
+    }
+
     async onChangeSelectSTO (e) {
 
         const searchWidget = this.context?.parent;
@@ -87,7 +92,7 @@ export default class SitoTab extends React.PureComponent<any,any>{
                         <div className="mb-2">
                             {
                                 (!listSTO.length && urlFetched["sito"]) && 
-                                <Alert className="w-100" form="basic" open text="Selezionare prima lo STO, poi fare click sul comune per evidenziarlo." type="info" withIcon/>
+                                <Alert className="w-100" form="basic" open text={this.nls("siteALert")} type="info" withIcon/>
                             }
                             {
                             (!listSTO.length && !urlFetched["sito"]) && 
@@ -99,7 +104,7 @@ export default class SitoTab extends React.PureComponent<any,any>{
                         <div className="mb-2">
                             {
                                 listSTO.length > 0 && 
-                                <Select className="w-100" onChange={this.onChangeSelectSTO} placeholder="Seleziona un comune">
+                                <Select className="w-100" onChange={this.onChangeSelectSTO} placeholder={this.nls("selectAMunicipality")}>
                                 {
                                     listSTO.map((el, i) => {
                                     return<Option value={el.attributes.OBJECTID}>
@@ -118,7 +123,7 @@ export default class SitoTab extends React.PureComponent<any,any>{
                                 !locatingPosition["status"] && locatingPosition["error"] && 
                                     <Alert 
                                     open = {!locatingPosition["status"] && locatingPosition["error"]  ?true:false}
-                                    text = {"Failed to locate position"}
+                                    text = {this.nls("failedToLocatePosition")}
                                     type = "error"
                                     onClose={()=>searchWidget.setLocatingPostion(false,false)}
                                     />

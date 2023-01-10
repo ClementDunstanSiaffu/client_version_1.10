@@ -17,6 +17,11 @@ export default class ComuniTab extends React.PureComponent<any,any>{
         this.onChangeSelectComuni = this.onChangeSelectComuni.bind(this);
     }
 
+    nls = (id:string)=>{
+        const searchWidget = this.context?.parent;
+        return searchWidget.nls(id);
+    }
+
     async onChangeSelectComuni (e) {
 
         const searchWidget = this.context?.parent;
@@ -70,7 +75,7 @@ export default class ComuniTab extends React.PureComponent<any,any>{
               <div className="col-md-12">
                 <div className="mb-2">
                   {(!listComuni.length && urlFetched["comuni"]) &&
-                    <Alert className="w-100" form="basic" open text="Selezionare il comune" type="info" withIcon/>
+                    <Alert className="w-100" form="basic" open text={this.nls("selectTheMunicipality")} type="info" withIcon/>
                   }
                   {
                   (!listComuni.length && !urlFetched["comuni"]) &&
@@ -82,7 +87,7 @@ export default class ComuniTab extends React.PureComponent<any,any>{
                 <div className="mb-2">
                   {
                    listComuni.length > 0 &&
-                      <Select className="w-100" onChange={this.onChangeSelectComuni} placeholder="Seleziona un comune">
+                      <Select className="w-100" onChange={this.onChangeSelectComuni} placeholder={this.nls("selectAMunicipality")}>
                         {listComuni.map((el, i) => {
                           return <Option value={el.attributes.OBJECTID}>
                             {el.attributes[Object.keys(el.attributes)[1]]}
@@ -97,7 +102,7 @@ export default class ComuniTab extends React.PureComponent<any,any>{
                     !locatingPosition["status"] && locatingPosition["error"] && 
                     <Alert 
                       open = {!locatingPosition["status"] && locatingPosition["error"]  ?true:false}
-                      text = {"Failed to locate position"}
+                      text = {this.nls("failedToLocatePosition")}
                       type = "error"
                       onClose={()=>searchWidget.setLocatingPostion(false,false)}
                     />
