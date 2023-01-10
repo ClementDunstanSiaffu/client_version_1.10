@@ -5,10 +5,72 @@ import {Select,Option,Alert,Loading} from 'jimu-ui';
 import { SearchWidgetContext } from '../../context/context';
 import LocatingPositionLoader from '../common/locating_position_loader';
 import Table from '../common/table';
+import Query from 'esri/rest/support/Query';
+import query from 'esri/rest/query';
+import Graphic from 'esri/Graphic';
+import helper from '../../helper/helper';
 
 export default class SitoTab extends React.PureComponent<any,any>{
 
     static contextType?: React.Context<any> = SearchWidgetContext;
+
+    constructor(props:any){
+        super(props);
+        this.onChangeSelectSTO = this.onChangeSelectSTO.bind(this);
+    }
+
+    async onChangeSelectSTO (e) {
+
+        const searchWidget = this.context?.parent;
+        const jimuMapView = this.context?.jimuMapView;
+        const searchSTO = this.context?.searchSTO
+
+        searchWidget.setLocatingPostion(true,false)
+        searchWidget.graphicLayerFound.removeAll();
+        const queryObject = new Query();
+        //TODO
+        // queryObject.where = `IDCOMPARTIMENTO = ${e.target.value}`;
+        queryObject.where = `OBJECTID = ${e.target.value}`;
+        queryObject.returnGeometry = true;
+        // @ts-expect-error
+        queryObject.outFields = '*';
+        try{
+          const results = await query.executeQueryJSON(searchSTO.url, queryObject);
+            //---TODO ---//
+          // results.features.sort(function (a, b) {
+          //   return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1));
+          // })
+    
+          let markerSymbol = {
+            type: "simple-marker", 
+            color: [0, 0, 0,0.5],
+            size:"50px",
+            outline:{
+              color:"transparent",
+              width:0
+            }
+          };
+          const feature = results.features;
+          const totalpolygonGraphic = []
+          if (feature?.length){
+            feature.forEach((el,i)=>{
+                const polygon = helper.returnGraphicsGeometry(el)
+                const polygonGraphic = new Graphic({geometry: polygon,symbol: markerSymbol});
+                searchWidget.graphicLayerFound.add(polygonGraphic);
+                totalpolygonGraphic.push(polygonGraphic);
+            })
+            if (totalpolygonGraphic.length){
+              jimuMapView.view.goTo({center:totalpolygonGraphic});
+              searchWidget.setLocatingPostion(false,false);
+            }
+            searchWidget.setState({resultSTO:feature});
+          }else{
+            searchWidget.setLocatingPostion(false,true);
+          }
+        }catch(err){
+            searchWidget.setLocatingPostion(false,true);
+        }
+      }
 
     render(): React.ReactNode {
 
@@ -35,29 +97,43 @@ export default class SitoTab extends React.PureComponent<any,any>{
                             }
                         </div>
                         <div className="mb-2">
-                        {
-                            listSTO.length > 0 && 
-                            <Select className="w-100" onChange={searchWidget.onChangeSelectSTO} placeholder="Seleziona un comune">
                             {
-                                listSTO.map((el, i) => {
-                                return<Option value={el.attributes.OBJECTID}>
-                                        {el.attributes[Object.keys(el.attributes)[1]]}
-                                        </Option>
-                                        //TODO - it requires where-tech map with the required field
-                                        // return<Option value={el.attributes.IDCOMPARTIMENTO}>
-                                        //         {/* {el.attributes.NOMECOMPARTIMENTO} */}
-                                        //       </Option>
-                                    })
+                                listSTO.length > 0 && 
+                                <Select className="w-100" onChange={this.onChangeSelectSTO} placeholder="Seleziona un comune">
+                                {
+                                    listSTO.map((el, i) => {
+                                    return<Option value={el.attributes.OBJECTID}>
+                                            {el.attributes[Object.keys(el.attributes)[1]]}
+                                            </Option>
+                                            //TODO - it requires where-tech map with the required field
+                                            // return<Option value={el.attributes.IDCOMPARTIMENTO}>
+                                            //         {/* {el.attributes.NOMECOMPARTIMENTO} */}
+                                            //       </Option>
+                                        })
+                                }
+                                </Select>
                             }
-                            </Select>
-                        }
-                        <LocatingPositionLoader locatingPosition={locatingPosition}/>
+                            <LocatingPositionLoader locatingPosition={locatingPosition}/>
+                            {
+                                !locatingPosition["status"] && locatingPosition["error"] && 
+                                    <Alert 
+                                    open = {!locatingPosition["status"] && locatingPosition["error"]  ?true:false}
+                                    text = {"Failed to locate position"}
+                                    type = "error"
+                                    onClose={()=>searchWidget.setLocatingPostion(false,false)}
+                                    />
+                            }
                         </div>
                         <div style={{maxHeight: 350, overflowY: 'auto'}}>
-                        { !resultSTO?.length
-                            ? ""
-                            : <Table className="w-100" list={resultSTO} handleClick={searchWidget.onClickViewTable}/>
-                        }
+                            { !resultSTO?.length
+                                ? ""
+                                : <Table 
+                                    className="w-100" 
+                                    list={resultSTO} 
+                                    handleClick={(e)=>searchWidget.onClickViewTable(e,"searchSTO")}
+                                    locatingPosition = {locatingPosition}
+                                />
+                            }
                         </div>
                   </div>
                 </div>

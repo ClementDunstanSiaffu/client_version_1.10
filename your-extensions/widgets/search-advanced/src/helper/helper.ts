@@ -1,4 +1,6 @@
 import Widget from "../runtime/widget";
+import Polygon from 'esri/geometry/Polygon';
+
 
 type selectedLayerType = {
     id:string,
@@ -114,6 +116,25 @@ class Helper{
                 jimuLayerViews[key]?.highLightHandle?.remove()
             })
         } 
+    }
+
+    returnGraphicsGeometry = (feature)=>{
+        let latitude,longitude,polygon;
+        const geometry = feature?.geometry;
+        const type = geometry.type;
+        //@ts-ignore
+        if (geometry?.longitude && geometry?.latitude){
+            //@ts-ignore
+            latitude = geometry.latitude;
+            //@ts-ignore
+            longitude = geometry.longitude;
+        }
+        if (longitude && latitude){
+            polygon = {type:type,longitude:longitude,latitude: latitude}
+        }else{
+            polygon = new Polygon(geometry);
+        }
+        return polygon;
     }
 }
 

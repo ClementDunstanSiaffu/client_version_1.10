@@ -5,10 +5,73 @@ import {Select,Option,Alert,Loading} from 'jimu-ui';
 import { SearchWidgetContext } from '../../context/context';
 import LocatingPositionLoader from '../common/locating_position_loader';
 import Table from '../common/table';
+import Query from 'esri/rest/support/Query';
+import query from 'esri/rest/query';
+import Graphic from 'esri/Graphic';
+import helper from '../../helper/helper';
 
 export default class AmbitoTab extends React.PureComponent<any,any>{
 
     static contextType?: React.Context<any> = SearchWidgetContext;
+
+    constructor(props:any){
+        super(props);
+        this.onChangeSelectAmbiti = this.onChangeSelectAmbiti.bind(this);
+    }
+
+    async onChangeSelectAmbiti (e) {
+
+
+        const searchWidget = this.context?.parent;
+        const jimuMapView = this.context?.jimuMapView;
+        const searchAmbiti = this.context?.searchAmbiti
+
+        searchWidget.setLocatingPostion(true,false);
+        searchWidget.graphicLayerFound.removeAll();
+        const queryObject = new Query();
+        //TODO
+        // queryObject.where = `IDAMBITO = "${e.target.value}"`;
+        queryObject.where = `OBJECTID = ${e.target.value}`;
+        queryObject.returnGeometry = true;
+        // @ts-expect-error
+        queryObject.outFields = '*';
+        try{
+          const results = await query.executeQueryJSON(searchAmbiti?.url, queryObject);
+          //TODO
+          // results.features.sort(function (a, b) {
+          //   return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1))
+          // })
+    
+          let markerSymbol = {
+            type: "simple-marker", 
+            color: [0, 0, 0,0.5],
+            size:"50px",
+            outline:{
+              color:"transparent",
+              width:0
+            }
+          };
+          const feature = results.features;
+          const totalpolygonGraphic = [];
+          if (feature.length){
+            feature.forEach((el,i)=>{
+                const polygon = helper.returnGraphicsGeometry(el);
+                const polygonGraphic = new Graphic({geometry: polygon,symbol: markerSymbol});
+                searchWidget.graphicLayerFound.add(polygonGraphic);
+                totalpolygonGraphic.push(polygonGraphic);
+            })
+            if (totalpolygonGraphic.length){
+              jimuMapView.view.goTo({center:totalpolygonGraphic});
+              searchWidget.setLocatingPostion(false,false);
+            }
+            searchWidget.setState({resultsAmbiti: results.features})
+          }else{
+            searchWidget.setLocatingPostion(false,true);
+          }
+          }catch(err){
+            searchWidget.setLocatingPostion(false,true);
+          }
+      }
 
     render(): React.ReactNode {
 
@@ -37,7 +100,7 @@ export default class AmbitoTab extends React.PureComponent<any,any>{
                 </div>
                 <div className="mb-2">
                   {listAmbiti.length > 0 && 
-                    <Select onChange={searchWidget.onChangeSelectAmbiti} placeholder="Seleziona un comune">
+                    <Select onChange={this.onChangeSelectAmbiti} placeholder="Seleziona un comune">
                       {listAmbiti.map((el, i) => {
                         return <Option value={el.attributes.OBJECTID}>{el.attributes[Object.keys(el.attributes)[1]]}</Option>
                         //TODO-require vpn 
@@ -47,11 +110,25 @@ export default class AmbitoTab extends React.PureComponent<any,any>{
                       })}
                     </Select>}
                   <LocatingPositionLoader locatingPosition={locatingPosition}/>
+                  {
+                    !locatingPosition["status"] && locatingPosition["error"] && 
+                        <Alert 
+                            open = {!locatingPosition["status"] && locatingPosition["error"]  ?true:false}
+                            text = {"Failed to locate position"}
+                            type = "error"
+                            onClose={()=>searchWidget.setLocatingPostion(false,false)}
+                        />
+                }
                 </div>
                 <div style={{maxHeight: 350, overflowY: 'auto'}}>
                   { !resultsAmbiti?.length
                       ? ""
-                      : <Table className="w-100" list={resultsAmbiti} handleClick={searchWidget.onClickViewTable} />
+                      : <Table 
+                            className="w-100" 
+                            list={resultsAmbiti} 
+                            handleClick={(e)=>searchWidget.onClickViewTable(e,"searchAmbiti")} 
+                            locatingPosition = {locatingPosition}
+                        />
                   }
                 </div>
               </div>

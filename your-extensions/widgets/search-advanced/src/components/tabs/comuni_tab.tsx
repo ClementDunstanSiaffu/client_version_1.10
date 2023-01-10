@@ -3,10 +3,59 @@ import {React,jsx} from 'jimu-core';
 import {Select,Option,Alert,Loading} from 'jimu-ui';
 import { SearchWidgetContext } from '../../context/context';
 import LocatingPositionLoader from '../common/locating_position_loader';
+import Query from 'esri/rest/support/Query';
+import query from 'esri/rest/query';
+import Graphic from 'esri/Graphic';
+import helper from '../../helper/helper';
 
 export default class ComuniTab extends React.PureComponent<any,any>{
 
     static contextType?: React.Context<any> = SearchWidgetContext;
+
+    constructor(props:any){
+        super(props);
+        this.onChangeSelectComuni = this.onChangeSelectComuni.bind(this);
+    }
+
+    async onChangeSelectComuni (e) {
+
+        const searchWidget = this.context?.parent;
+        const jimuMapView = this.context?.jimuMapView;
+        const searchItems = this.context?.searchItems
+
+        searchWidget.graphicLayerFound.removeAll();
+        const queryObject = new Query();
+        queryObject.where = `OBJECTID = ${e.target.value}`;
+        queryObject.returnGeometry = true;
+        queryObject.outFields = searchItems?.outFields;
+        searchWidget.setLocatingPostion(true,false);
+        try{
+          const results = await query.executeQueryJSON(searchItems?.url, queryObject);
+          if(results && results.features?.length){
+            const feature = results.features[0];
+            const polygon = helper.returnGraphicsGeometry(feature)      
+            let markerSymbol = {
+              type: "simple-marker", 
+              color: [0, 0, 0,0.5],
+              size:"100px",
+              outline:{
+                color:"transparent",
+                width:0
+              }
+            };
+    
+            const polygonGraphic = new Graphic({geometry: polygon,symbol: markerSymbol})
+            searchWidget.graphicLayerFound.add(polygonGraphic);
+            jimuMapView.view.goTo({center: polygonGraphic});
+            searchWidget.setLocatingPostion(false,false);      
+          }else{
+            searchWidget.setLocatingPostion(false,true);
+          }
+        }catch(err){
+            searchWidget.setLocatingPostion(false,true);
+        }
+     
+      }
 
     render(): React.ReactNode {
 
@@ -33,7 +82,7 @@ export default class ComuniTab extends React.PureComponent<any,any>{
                 <div className="mb-2">
                   {
                    listComuni.length > 0 &&
-                      <Select className="w-100" onChange={searchWidget.onChangeSelectComuni} placeholder="Seleziona un comune">
+                      <Select className="w-100" onChange={this.onChangeSelectComuni} placeholder="Seleziona un comune">
                         {listComuni.map((el, i) => {
                           return <Option value={el.attributes.OBJECTID}>
                             {el.attributes[Object.keys(el.attributes)[1]]}
