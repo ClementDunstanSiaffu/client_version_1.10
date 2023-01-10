@@ -145,8 +145,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     this.onChangeSelectSTO = this.onChangeSelectSTO.bind(this);
 
     // //AMBITI
-    // this.populateAmbiti();
-    // this.onChangeSelectAmbiti = this.onChangeSelectAmbiti.bind(this);
+    this.populateAmbiti();
+    this.onChangeSelectAmbiti = this.onChangeSelectAmbiti.bind(this);
 
     this.onChangeTabs = this.onChangeTabs.bind(this);
     this.getAllCheckedLayers = this.getAllCheckedLayers.bind(this);
@@ -351,6 +351,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     this.setState({
       listAmbiti: results.features
     })
+    this.updateFetchStatus("ambito",true)
   }
 
 
@@ -480,7 +481,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     this.graphicLayerFound.removeAll();
     const queryObject = new Query();
     //TODO
-    // queryObject.where = `IDCOMPARTIMENTO = "${e.target.value}"`;
+    // queryObject.where = `IDCOMPARTIMENTO = ${e.target.value}`;
     queryObject.where = `OBJECTID = ${e.target.value}`;
     queryObject.returnGeometry = true;
     // @ts-expect-error
@@ -535,29 +536,75 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   async onChangeSelectAmbiti (e) {
     this.graphicLayerFound.removeAll();
     const queryObject = new Query();
-    queryObject.where = `IDAMBITO = "${e.target.value}"`;
+    //TODO
+    // queryObject.where = `IDAMBITO = "${e.target.value}"`;
+    queryObject.where = `OBJECTID = ${e.target.value}`;
     queryObject.returnGeometry = true;
     // @ts-expect-error
     queryObject.outFields = '*';
     const results = await query.executeQueryJSON(this.props.config.searchItems.url, queryObject);
-    results.features.sort(function (a, b) {
-      return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1))
-    })
+    //TODO
+    // results.features.sort(function (a, b) {
+    //   return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1))
+    // })
+
+    let markerSymbol = {
+      type: "simple-marker", 
+      color: [0, 0, 0,0.5],
+      size:"50px",
+      outline:{
+        color:"transparent",
+        width:0
+      }
+    };
+    const feature = results.features;
+    let latitude,longitude,polygon;
     const totalpolygonGraphic = [];
-    results.features.forEach((el, i) => {
-      const geometryComune = el.geometry;
-      const polygon = new Polygon(geometryComune);
-      const polygonGraphic = new Graphic({
-        geometry: polygon,
-        symbol: this.symbolFound
+    if (feature.length){
+      feature.forEach((el,i)=>{
+        const geometry = el.geometry;
+        const type = geometry.type;
+        //@ts-ignore
+        if (geometry.latitude && geometry.longitude){
+          //@ts-ignore
+          latitude = geometry.latitude;
+          //@ts-ignore
+          longitude = geometry.longitude;
+          polygon = {
+            type:type,
+            longitude:longitude,
+            latitude: latitude
+          }
+        }else{
+          polygon = new Polygon(geometry);
+        }
+        const polygonGraphic = new Graphic({geometry: polygon,symbol: markerSymbol});
+        this.graphicLayerFound.add(polygonGraphic);
+        totalpolygonGraphic.push(polygonGraphic);
       })
-      this.graphicLayerFound.add(polygonGraphic);
-      totalpolygonGraphic.push(polygonGraphic);
-    })
+      if (totalpolygonGraphic.length){
+        this.state.jimuMapView.view.goTo({center:totalpolygonGraphic});
+      }
+      this.setState({resultsAmbiti: results.features})
+    }
 
-    this.state.jimuMapView.view.goTo({center: [totalpolygonGraphic]})
 
-    this.setState({resultsAmbiti: results.features})
+
+    // const totalpolygonGraphic = [];
+    // results.features.forEach((el, i) => {
+    //   const geometryComune = el.geometry;
+    //   const polygon = new Polygon(geometryComune);
+    //   const polygonGraphic = new Graphic({
+    //     geometry: polygon,
+    //     symbol: this.symbolFound
+    //   })
+    //   this.graphicLayerFound.add(polygonGraphic);
+    //   totalpolygonGraphic.push(polygonGraphic);
+    // })
+
+    // this.state.jimuMapView.view.goTo({center: [totalpolygonGraphic]})
+
+    // this.setState({resultsAmbiti: results.features})
   }
 
 
@@ -851,16 +898,31 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                 <div className="row">
                   <div className="col-md-12">
                     <div className="mb-2">
-                      <Alert className="w-100" form="basic" open text="Selezionare prima l'ambito, poi fare click sul comune per evidenziarlo" type="info" withIcon/>
+                      {
+                        (!this.state.listAmbiti.length && this.state.urlFetched["ambito"]) && 
+                        <Alert className="w-100" form="basic" open text="Selezionare prima l'ambito, poi fare click sul comune per evidenziarlo" type="info" withIcon/>
+                      }
+                      {
+                        (!this.state.listAmbiti.length && !this.state.urlFetched["ambito"]) && 
+                          <div style={{height:'80px',position:'relative',width:'100%',marginLeft:"auto",marginRight:"auto"}}>
+                            <Loading />
+                          </div>
+                      }
+                      {/* <Alert className="w-100" form="basic" open text="Selezionare prima l'ambito, poi fare click sul comune per evidenziarlo" type="info" withIcon/> */}
                     </div>
                     <div className="mb-2">
-                      <Select onChange={this.onChangeSelectAmbiti} placeholder="Seleziona un comune">
-                        {this.state.listAmbiti.map((el, i) => {
-                          return <Option value={el.attributes.IDAMBITO}>
-                            {el.attributes.NOMEAMBITO}
-                          </Option>
-                        })}
-                      </Select>
+                      {this.state.listAmbiti.length > 0 && 
+                        <Select onChange={this.onChangeSelectAmbiti} placeholder="Seleziona un comune">
+                          {this.state.listAmbiti.map((el, i) => {
+                            return <Option value={el.attributes.OBJECTID}>
+                                      {el.attributes[Object.keys(el.attributes)[1]]}
+                                    </Option>
+                            //TODO-require vpn 
+                            // return <Option value={el.attributes.IDAMBITO}>
+                            //   {el.attributes.NOMEAMBITO}
+                            // </Option>
+                          })}
+                      </Select>}
                     </div>
                     <div style={{maxHeight: 350, overflowY: 'auto'}}>
                       { !this.state.resultsAmbiti?.length
