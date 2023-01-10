@@ -16,6 +16,7 @@ import Sketch from "esri/widgets/Sketch";
 import helper from '../helper/helper';
 import AlertComponent from '../components/common/alert'
 import SelectFilterType from '../components/select_filter'
+import LocatingPositionLoader from '../components/common/locating_position_loader'
 
 function Table (props) {
   const { list, handleClick } = props
@@ -469,7 +470,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         this.setLocatingPostion(false,false);      
       }else{
         this.setLocatingPostion(false,true);
-        console.log("Errore select comuni");
       }
     }catch(err){
       this.setLocatingPostion(false,true);
@@ -478,6 +478,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   }
 
   async onChangeSelectSTO (e) {
+    this.setLocatingPostion(true,false)
     this.graphicLayerFound.removeAll();
     const queryObject = new Query();
     //TODO
@@ -486,54 +487,62 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     queryObject.returnGeometry = true;
     // @ts-expect-error
     queryObject.outFields = '*';
-    const results = await query.executeQueryJSON(this.props.config.searchItems.url, queryObject);
-      //---TODO ---//
-    // results.features.sort(function (a, b) {
-    //   return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1));
-    // })
+    try{
+      const results = await query.executeQueryJSON(this.props.config.searchItems.url, queryObject);
+        //---TODO ---//
+      // results.features.sort(function (a, b) {
+      //   return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1));
+      // })
 
-    let markerSymbol = {
-      type: "simple-marker", 
-      color: [0, 0, 0,0.5],
-      size:"50px",
-      outline:{
-        color:"transparent",
-        width:0
-      }
-    };
-    const feature = results.features;
-    let latitude,longitude,polygon;
-    const totalpolygonGraphic = []
-    if (feature.length){
-      feature.forEach((el,i)=>{
-        const geometry = el.geometry;
-        const type = geometry.type;
-        //@ts-ignore
-        if (geometry.latitude && geometry.longitude){
-          //@ts-ignore
-          latitude = geometry.latitude;
-          //@ts-ignore
-          longitude = geometry.longitude;
-          polygon = {
-            type:type,
-            longitude:longitude,
-            latitude: latitude
-          }
-        }else{
-          polygon = new Polygon(geometry);
+      let markerSymbol = {
+        type: "simple-marker", 
+        color: [0, 0, 0,0.5],
+        size:"50px",
+        outline:{
+          color:"transparent",
+          width:0
         }
-        const polygonGraphic = new Graphic({geometry: polygon,symbol: markerSymbol});
-        this.graphicLayerFound.add(polygonGraphic);
-        totalpolygonGraphic.push(polygonGraphic);
-      })
-      if (totalpolygonGraphic.length){
-        this.state.jimuMapView.view.goTo({center:totalpolygonGraphic});
+      };
+      const feature = results.features;
+      let latitude,longitude,polygon;
+      const totalpolygonGraphic = []
+      if (feature?.length){
+        feature.forEach((el,i)=>{
+          const geometry = el.geometry;
+          const type = geometry.type;
+          //@ts-ignore
+          if (geometry.latitude && geometry.longitude){
+            //@ts-ignore
+            latitude = geometry.latitude;
+            //@ts-ignore
+            longitude = geometry.longitude;
+            polygon = {
+              type:type,
+              longitude:longitude,
+              latitude: latitude
+            }
+          }else{
+            polygon = new Polygon(geometry);
+          }
+          const polygonGraphic = new Graphic({geometry: polygon,symbol: markerSymbol});
+          this.graphicLayerFound.add(polygonGraphic);
+          totalpolygonGraphic.push(polygonGraphic);
+        })
+        if (totalpolygonGraphic.length){
+          this.state.jimuMapView.view.goTo({center:totalpolygonGraphic});
+          this.setLocatingPostion(false,false);
+        }
+        this.setState({resultSTO:feature});
+      }else{
+        this.setLocatingPostion(false,true);
       }
-      this.setState({resultSTO:feature})
+    }catch(err){
+      this.setLocatingPostion(false,true);
     }
   }
 
   async onChangeSelectAmbiti (e) {
+    this.setLocatingPostion(true,false);
     this.graphicLayerFound.removeAll();
     const queryObject = new Query();
     //TODO
@@ -542,51 +551,58 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     queryObject.returnGeometry = true;
     // @ts-expect-error
     queryObject.outFields = '*';
-    const results = await query.executeQueryJSON(this.props.config.searchItems.url, queryObject);
-    //TODO
-    // results.features.sort(function (a, b) {
-    //   return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1))
-    // })
+    try{
+      const results = await query.executeQueryJSON(this.props.config.searchItems.url, queryObject);
+      //TODO
+      // results.features.sort(function (a, b) {
+      //   return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1))
+      // })
 
-    let markerSymbol = {
-      type: "simple-marker", 
-      color: [0, 0, 0,0.5],
-      size:"50px",
-      outline:{
-        color:"transparent",
-        width:0
-      }
-    };
-    const feature = results.features;
-    let latitude,longitude,polygon;
-    const totalpolygonGraphic = [];
-    if (feature.length){
-      feature.forEach((el,i)=>{
-        const geometry = el.geometry;
-        const type = geometry.type;
-        //@ts-ignore
-        if (geometry.latitude && geometry.longitude){
-          //@ts-ignore
-          latitude = geometry.latitude;
-          //@ts-ignore
-          longitude = geometry.longitude;
-          polygon = {
-            type:type,
-            longitude:longitude,
-            latitude: latitude
-          }
-        }else{
-          polygon = new Polygon(geometry);
+      let markerSymbol = {
+        type: "simple-marker", 
+        color: [0, 0, 0,0.5],
+        size:"50px",
+        outline:{
+          color:"transparent",
+          width:0
         }
-        const polygonGraphic = new Graphic({geometry: polygon,symbol: markerSymbol});
-        this.graphicLayerFound.add(polygonGraphic);
-        totalpolygonGraphic.push(polygonGraphic);
-      })
-      if (totalpolygonGraphic.length){
-        this.state.jimuMapView.view.goTo({center:totalpolygonGraphic});
+      };
+      const feature = results.features;
+      let latitude,longitude,polygon;
+      const totalpolygonGraphic = [];
+      if (feature.length){
+        feature.forEach((el,i)=>{
+          const geometry = el.geometry;
+          const type = geometry.type;
+          //@ts-ignore
+          if (geometry.latitude && geometry.longitude){
+            //@ts-ignore
+            latitude = geometry.latitude;
+            //@ts-ignore
+            longitude = geometry.longitude;
+            polygon = {
+              type:type,
+              longitude:longitude,
+              latitude: latitude
+            }
+          }else{
+            polygon = new Polygon(geometry);
+          }
+          const polygonGraphic = new Graphic({geometry: polygon,symbol: markerSymbol});
+          this.graphicLayerFound.add(polygonGraphic);
+          totalpolygonGraphic.push(polygonGraphic);
+        })
+        if (totalpolygonGraphic.length){
+          this.state.jimuMapView.view.goTo({center:totalpolygonGraphic});
+          this.setLocatingPostion(false,false);
+        }
+        this.setState({resultsAmbiti: results.features})
+      }else{
+        this.setLocatingPostion(false,true);
       }
-      this.setState({resultsAmbiti: results.features})
-    }
+      }catch(err){
+        this.setLocatingPostion(false,true);
+      }
 
 
 
@@ -823,7 +839,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                             })}
                           </Select>
                       }
-                      {
+                      <LocatingPositionLoader locatingPosition={this.state.locatingPosition}/>
+                      {/* {
                         this.state.locatingPosition["status"] && !this.state.locatingPosition["error"] &&
                         (
                           <div style={{width:"100%",display:"flex",flexDirection:"column",justifyContent:"center",height:"auto"}}>
@@ -835,11 +852,11 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                             </div>
                           </div>
                         )
-                      }
+                      } */}
                       {
                         !this.state.locatingPosition["status"] && this.state.locatingPosition["error"] && 
                         <AlertComponent 
-                          open = {!this.state.locatingPosition["status"] && this.state.locatingPosition["error"] !== ""  ?true:false}
+                          open = {!this.state.locatingPosition["status"] && this.state.locatingPosition["error"]  ?true:false}
                           text = {"Failed to locate position"}
                           type = "error"
                           onClose={()=>this.setLocatingPostion(false,false)}
@@ -882,6 +899,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                           }
                         </Select>
                       }
+                      <LocatingPositionLoader locatingPosition={this.state.locatingPosition}/>
                     </div>
                     <div style={{maxHeight: 350, overflowY: 'auto'}}>
                       { !this.state.resultSTO?.length
@@ -923,6 +941,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                             // </Option>
                           })}
                       </Select>}
+                      <LocatingPositionLoader locatingPosition={this.state.locatingPosition}/>
                     </div>
                     <div style={{maxHeight: 350, overflowY: 'auto'}}>
                       { !this.state.resultsAmbiti?.length
