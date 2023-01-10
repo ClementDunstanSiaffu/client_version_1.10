@@ -16,55 +16,61 @@ import Sketch from "esri/widgets/Sketch";
 import helper from '../helper/helper';
 import AlertComponent from '../components/common/alert'
 import SelectFilterType from '../components/select_filter'
-import LocatingPositionLoader from '../components/common/locating_position_loader'
+import LocatingPositionLoader from '../components/common/locating_position_loader';
+import Table from '../components/common/table';
+import { SearchWidgetContext } from '../context/context'
+import IndrizzoTab from '../components/tabs/indrizzo_tab'
+import ComuniTab from '../components/tabs/comuni_tab'
+import SitoTab from '../components/tabs/sito_tab'
+import AmbitoTab from '../components/tabs/ambito_tab'
 
-function Table (props) {
-  const { list, handleClick } = props
-  if (list?.length){
-    const item = list[0].attributes;
-    const keys = Object.keys(item);
+// function Table (props) {
+//   const { list, handleClick } = props
+//   if (list?.length){
+//     const item = list[0].attributes;
+//     const keys = Object.keys(item);
 
-    return (
-      <table style={{width:"100%"}}>
-        <caption></caption>
-        <thead>
-          {/*TODO */}
-          {/* <tr>
-            <th>Comune</th>
-            <th>Codice Istat</th>
-          </tr> */}
-          <tr>
-            <th style={{marginRight:70}}>{keys[1]}</th>
-            <th  style={{marginRight:70}}>{keys[2]}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {list.map((sto, i) => {
-            const itemKeys = Object.keys(sto.attributes);
-            return(
-              <tr className="item-row" key={i}>
-                <td className="item-table" id={sto.attributes.OBJECTID} onClick={handleClick}>
-                  {sto.attributes[itemKeys[1]]}
-                </td>
-                <td className="item-table" id={sto.attributes.OBJECTID} onClick={handleClick}>
-                  {sto.attributes[itemKeys[2]]}
-                </td>
-              </tr>
-            )})
-          }
-          {/* TODO */}
-          {/* {list.map((sto, i) => (
-              <tr className="item-row" key={i}>
-                <td className="item-table" id={sto.attributes.OBJECTID} onClick={handleClick}>{sto.attributes.NOMECOMUNE}</td>
-                <td className="item-table" id={sto.attributes.OBJECTID} onClick={handleClick}>{sto.attributes.ISTAT}</td>
-              </tr>
-          ))} */}
-        </tbody>
-      </table>
-    )
-  }
-  return null;
-}
+//     return (
+//       <table style={{width:"100%"}}>
+//         <caption></caption>
+//         <thead>
+//           {/*TODO */}
+//           {/* <tr>
+//             <th>Comune</th>
+//             <th>Codice Istat</th>
+//           </tr> */}
+//           <tr>
+//             <th style={{marginRight:70}}>{keys[1]}</th>
+//             <th  style={{marginRight:70}}>{keys[2]}</th>
+//           </tr>
+//         </thead>
+//         <tbody>
+//           {list.map((sto, i) => {
+//             const itemKeys = Object.keys(sto.attributes);
+//             return(
+//               <tr className="item-row" key={i}>
+//                 <td className="item-table" id={sto.attributes.OBJECTID} onClick={handleClick}>
+//                   {sto.attributes[itemKeys[1]]}
+//                 </td>
+//                 <td className="item-table" id={sto.attributes.OBJECTID} onClick={handleClick}>
+//                   {sto.attributes[itemKeys[2]]}
+//                 </td>
+//               </tr>
+//             )})
+//           }
+//           {/* TODO */}
+//           {/* {list.map((sto, i) => (
+//               <tr className="item-row" key={i}>
+//                 <td className="item-table" id={sto.attributes.OBJECTID} onClick={handleClick}>{sto.attributes.NOMECOMUNE}</td>
+//                 <td className="item-table" id={sto.attributes.OBJECTID} onClick={handleClick}>{sto.attributes.ISTAT}</td>
+//               </tr>
+//           ))} */}
+//         </tbody>
+//       </table>
+//     )
+//   }
+//   return null;
+// }
 
 type stateValueType = {
   stateValue:{value:{checkedLayers:string[],filterValue:number}}}
@@ -705,15 +711,17 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   //TODO defaultValue spostare in config
   //TODO config abilitare tab true/false
   render () {
-    const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
-    const filterValue = this.props.stateValue?.value?.filterValue??1;
+    // const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
+    // const filterValue = this.props.stateValue?.value?.filterValue??1;
     return (
+      <SearchWidgetContext.Provider value={{...this.state,...this.props.stateValue?.value,"parent":this}}>
         <div className="widget-attribute-table jimu-widget">
           {this.props.hasOwnProperty('useMapWidgetIds') && this.props.useMapWidgetIds && this.props.useMapWidgetIds[0] && (
               <JimuMapViewComponent useMapWidgetId={this.props.useMapWidgetIds?.[0]} onActiveViewChange={this.activeViewChangeHandler} />
           )}
           <Tabs defaultValue="search-advanced-tab-indirizzi" type="tabs" onChange={this.onChangeTabs}>
-            <Tab id="search-advanced-tab-indirizzi" title="Indirizzi">
+            <Tab id="search-advanced-tab-indirizzi" title="Indirizzi"><IndrizzoTab /></Tab>
+            {/* <Tab id="search-advanced-tab-indirizzi" title="Indirizzi">
               <div>
                 <CalciteAccordion className="mt-4 mb-2">
                   <CalciteAccordionItem active={true} itemTitle="Seleziona indirizzo">
@@ -793,9 +801,10 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                       onClose={()=>this.setState({errorMessage:""})}
                     />
               </div>
-            </Tab>
+            </Tab> */}
             <Tab id="search-advanced-tab-comuni" title="Comuni">
-              <div className="mt-4 container-fluid" style={{overflow: 'hidden'}}>
+              <ComuniTab />
+              {/* <div className="mt-4 container-fluid" style={{overflow: 'hidden'}}>
                 <div className="row">
                   <div className="col-md-12">
                     <div className="mb-2">
@@ -815,9 +824,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                           <Select className="w-100" onChange={this.onChangeSelectComuni} placeholder="Seleziona un comune">
                             {this.state.listComuni.map((el, i) => {
                               return <Option value={el.attributes.OBJECTID}>
-                                {el.attributes[Object.keys(el.attributes)[1]]}
-                                {/*TODO -it requires vpn to work */}
-                                {/* {el.attributes.NOMECOMUNE} */}
+                                {el.attributes.NOMECOMUNE}
                               </Option>
                             })}
                           </Select>
@@ -835,10 +842,11 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </Tab>
             <Tab id="search-advanced-tab-sito" title="Sito">
-              <div className="mt-4 container-fluid">
+              <SitoTab />
+              {/* <div className="mt-4 container-fluid">
                 <div className="row">
                   <div className="col-md-12">
                     <div className="mb-2">
@@ -858,13 +866,9 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                         <Select className="w-100" onChange={this.onChangeSelectSTO} placeholder="Seleziona un comune">
                           {
                             this.state.listSTO.map((el, i) => {
-                              return<Option value={el.attributes.OBJECTID}>
-                                      {el.attributes[Object.keys(el.attributes)[1]]}
-                                    </Option>
-                                    //TODO - it requires where-tech map with the required field
-                                    // return<Option value={el.attributes.IDCOMPARTIMENTO}>
-                                    //         {/* {el.attributes.NOMECOMPARTIMENTO} */}
-                                    //       </Option>
+                                    return<Option value={el.attributes.IDCOMPARTIMENTO}>
+                                            {el.attributes.NOMECOMPARTIMENTO}
+                                          </Option>
                                   })
                           }
                         </Select>
@@ -879,10 +883,11 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </Tab>
             <Tab id="search-advanced-tab-Ambito" title="Ambito">
-              <div className="mt-4 container-fluid">
+              <AmbitoTab />
+              {/* <div className="mt-4 container-fluid">
                 <div className="row">
                   <div className="col-md-12">
                     <div className="mb-2">
@@ -896,19 +901,15 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                             <Loading />
                           </div>
                       }
-                      {/* <Alert className="w-100" form="basic" open text="Selezionare prima l'ambito, poi fare click sul comune per evidenziarlo" type="info" withIcon/> */}
+                      <Alert className="w-100" form="basic" open text="Selezionare prima l'ambito, poi fare click sul comune per evidenziarlo" type="info" withIcon/>
                     </div>
                     <div className="mb-2">
                       {this.state.listAmbiti.length > 0 && 
                         <Select onChange={this.onChangeSelectAmbiti} placeholder="Seleziona un comune">
                           {this.state.listAmbiti.map((el, i) => {
-                            return <Option value={el.attributes.OBJECTID}>
-                                      {el.attributes[Object.keys(el.attributes)[1]]}
-                                    </Option>
-                            //TODO-require vpn 
-                            // return <Option value={el.attributes.IDAMBITO}>
-                            //   {el.attributes.NOMEAMBITO}
-                            // </Option>
+                            return <Option value={el.attributes.IDAMBITO}>
+                              {el.attributes.NOMEAMBITO}
+                            </Option>
                           })}
                       </Select>}
                       <LocatingPositionLoader locatingPosition={this.state.locatingPosition}/>
@@ -921,10 +922,11 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </Tab>
           </Tabs>
         </div>
+        </SearchWidgetContext.Provider>
     )
   }
 }

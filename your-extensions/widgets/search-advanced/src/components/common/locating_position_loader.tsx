@@ -1,5 +1,5 @@
 
-import {React} from 'jimu-core';
+import {React,jsx} from 'jimu-core';
 import {Loading} from 'jimu-ui';
 
 type propsType = {
