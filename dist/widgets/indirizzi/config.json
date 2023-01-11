@@ -1,0 +1,26 @@
+{
+  "servizi_da_mappa": true,
+  "maxWidthBuffer" : 5000,
+  "slideBuffer" : true,
+  "queryConGeometry" : true,
+  "service_1": {
+    "url": "https://tsarcgis.aqp.it/server/rest/services/Operational/QUERY_SCHEMA_GESTORE_GO_CON_NODI/FeatureServer",
+    "layerId": 18,
+    "layerListIds":[1,2,3,4]
+  },
+  "service_2": {
+    "url": "https://tsarcgis.aqp.it/server/rest/services/Operational/QUERY_SCHEMA_GESTORE_GO_CON_NODI/FeatureServer",
+    "layerId": 19,
+    "layerListIds":[1,2,3,4]
+  },
+  "service_3": {
+    "url": "https://tsarcgis.aqp.it/server/rest/services/Operational/QUERY_SCHEMA_GESTORE_GO_CON_NODI/FeatureServer",
+    "layerId": 20,
+    "layerListIds":[1,2,3,4]
+  },
+  "service_4": {
+    "url": "https://tsarcgis.aqp.it/server/rest/services/Operational/QUERY_SIT/FeatureServer",
+    "layerId": 20,
+    "layerListIds":[1,2,3,4]
+  }
+}
