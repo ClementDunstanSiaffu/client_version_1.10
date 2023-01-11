@@ -1,26 +1,31 @@
 {
-  "servizi_da_mappa": true,
-  "maxWidthBuffer" : 5000,
-  "slideBuffer" : true,
-  "queryConGeometry" : true,
-  "service_1": {
-    "url": "https://tsarcgis.aqp.it/server/rest/services/Operational/QUERY_SCHEMA_GESTORE_GO_CON_NODI/FeatureServer",
-    "layerId": 18,
-    "layerListIds":[1,2,3,4]
+  "settings":{
+    "idWidgetTable":" ",
+    "servizi_da_mappa": true,
+    "maxWidthBuffer" : 5000,
+    "slideBuffer" : true,
+    "queryConGeometry" : true
   },
-  "service_2": {
-    "url": "https://tsarcgis.aqp.it/server/rest/services/Operational/QUERY_SCHEMA_GESTORE_GO_CON_NODI/FeatureServer",
-    "layerId": 19,
-    "layerListIds":[1,2,3,4]
-  },
-  "service_3": {
-    "url": "https://tsarcgis.aqp.it/server/rest/services/Operational/QUERY_SCHEMA_GESTORE_GO_CON_NODI/FeatureServer",
-    "layerId": 20,
-    "layerListIds":[1,2,3,4]
-  },
-  "service_4": {
-    "url": "https://tsarcgis.aqp.it/server/rest/services/Operational/QUERY_SIT/FeatureServer",
-    "layerId": 20,
-    "layerListIds":[1,2,3,4]
+  "services":{
+    "service_1": {
+      "url": "https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/Bureau_of_Economic_Analysis_Gross_Domestic_Product_GDP_2019/FeatureServer",
+      "layerListIds":[0,1,2,3],
+      "title":"Bureau_of_Economic_Analysis_Gross_Domestic_Product_GDP_2019"
+    },
+    "service_2": {
+      "url": "https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/Average_Household_Size_and_Population_Density_WFL1/FeatureServer",
+      "layerListIds":[0,1,2,3],
+      "title":"Average_Household_Size_and_Population_Density_WFL1"
+    },
+    "service_3": {
+      "url": "https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/AssessmentNeighborhoods/FeatureServer",
+      "layerListIds":[0],
+      "title":"AssessmentNeighborhoods"
+    },
+    "service_4": {
+      "url": "https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/AmbulancesAGOL/FeatureServer",
+      "layerListIds":[0],
+      "title":"AmbulancesAGOL"
+    }
   }
 }

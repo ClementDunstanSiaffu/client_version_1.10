@@ -80,33 +80,39 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     }
     
     getFeatureLayer (){
-        const featureUrl = this.props.config.service_1.url;
+        const featureUrl = this.props.config.services.service_1.url;
         return new FeatureLayer({url:featureUrl,outFields: ["*"]});
     }
     
     activeViewChangeHandler (jmv: JimuMapView) {
         if (jmv) {
-            jmv.view.map.removeAll()
             jmv.view.map.add(this.graphicLayerFound);
             jmv.view.map.add(this.graphicLayerSelected);
             Widget.activeView = jmv;
             let arraySup = [];
 
-            const featureLayer = this.getFeatureLayer();
+            // const featureLayer = this.getFeatureLayer();
             // const layerViewProps = new LayerView({layer:featureLayer,visible:true,spatialReferenceSupported:true})
             // const layerView = new JimuLayerView({layer:featureLayer,view:layerViewProps});
-            jmv.view.map.add(featureLayer);
+            // jmv.view.map.add(featureLayer);
 
-            // TODO add layer from featureServer
-            jmv.view.map.allLayers.forEach((f, index) =>{
-                if(f.type === "feature"){
-                    console.log(f,"check f")
-                    arraySup.push({
-                        label:f.title,
-                        value:f.id
-                    });
-                }
-            });
+            const services = this.props.config.services
+            const serviceItems = Object.keys(services);
+            serviceItems.forEach((key)=>{
+                arraySup.push({
+                    label:services[key].title,
+                    value:key
+                })
+            })
+
+            // jmv.view.map.allLayers.forEach((f, index) =>{
+            //     if(f.type === "feature"){
+            //         arraySup.push({
+            //             label:f.title,
+            //             value:f.id
+            //         });
+            //     }
+            // });
 
 
             //TODO -we don't use it now//
@@ -138,18 +144,20 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
             //     }
             // });
 
-            const sources = [{
-                layer:featureLayer,
-                maxResults: 5,
-                searchFields:featureLayer.displayField,
-                displayField:featureLayer.displayField,
-                maxSuggestions: 6,
-                exactMatch:false
-            }]
+            // const sources = [{
+            //     layer:featureLayer,
+            //     maxResults: 5,
+            //     searchFields:featureLayer.displayField,
+            //     displayField:featureLayer.displayField,
+            //     maxSuggestions: 6,
+            //     exactMatch:false,
+            //     minSuggestCharacters:0,
+            //     outFields: ["*"],
+            // }]
 
             const searchWidget = new Search({
                 view: jmv.view,
-                sources:sources,
+                // sources:sources,
                 container: "search-widget-address"//TODO migliorare senza id cablato
             });
 
@@ -221,18 +229,23 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     }
     async onChangeSelectLayer (e,n,s){
         const view = this.state.jimuMapView.view;
-        const layer = view.map.allLayers.find((item)=>item.id === n);
+        // const layer = view.map.allLayers.find((item)=>item.id === n);
         if(e.target.checked){
-            this.state.listServices.push(n);
-            view.goTo(layer.fullExtent)
+            const copiedListServices = [...this.state.listServices,n];
+            this.setState({listServices:copiedListServices})
+            // this.state.listServices.push(n);
+            // view.goTo(layer.fullExtent)
         }else{
             let index = this.state.listServices.indexOf(n);
             if (index > -1) {
-                this.state.listServices.splice(index,1);
+                const copiedListServices = [...this.state.listServices];
+                copiedListServices.splice(index,1);
+                this.setState({listServices:copiedListServices})
+                // this.state.listServices.splice(index,1);
             }
         }
 
-        this.setState(this.state);
+        // this.setState(this.state);
     }
     onChangeSelectTypeGeometry(e){
         // @ts-ignore
@@ -290,7 +303,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
             errorMessage:arrayErrors.join()
         });
 
-        if(arrayErrors.length === 0 && this.props.config.idWidgetTable !== ""){
+        if(arrayErrors.length === 0 && this.props.config.settings.idWidgetTable !== ""){
 
             this.state.jimuMapView.view.map.allLayers.forEach((f, index) =>{
                 if(f && f.type==="feature" && this.state.listServices.indexOf(index) !== -1){
@@ -303,7 +316,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
             //mando layerid ad TableList
             this.props.dispatch(
                 appActions.widgetStatePropChange(
-                    this.props.config.idWidgetTable,
+                    this.props.config.settings.idWidgetTable,
                     "layerOpen",
                     {
                         typeSelected:this.state.typeSelected,
@@ -357,7 +370,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
             errorMessage:arrayErrors.join()
         });
 
-        if(arrayErrors.length === 0 && this.props.config.idWidgetTable !== ""){
+        if(arrayErrors.length === 0 && this.props.config.settings.idWidgetTable !== ""){
 
             this.state.jimuMapView.view.map.allLayers.forEach((f, index) =>{
                 if(f && f.type==="feature" && this.state.listServices.indexOf(index) !== -1){
@@ -370,7 +383,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
             //mando layerid ad TableList
             this.props.dispatch(
                 appActions.widgetStatePropChange(
-                    this.props.config.idWidgetTable,
+                    this.props.config.settings.idWidgetTable,
                     "layerOpen",
                     {
                         typeSelected:this.state.typeSelected,
