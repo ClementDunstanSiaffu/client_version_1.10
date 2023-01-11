@@ -53,14 +53,13 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                 this.props.stateValue?.value?.layerOpen &&
                 this.props.stateValue?.value?.getAllLayers &&
                 this.props.stateValue?.value?.getActiveView &&
-                this.props.stateValue?.value?.getAllJimuLayerViews&&
                 this.props.stateValue?.value?.checkedLayers &&
                 this.props.stateValue?.value?.numberOfAttribute&&
                 this.props.stateValue?.value?.createTable
         ){
             const activeView = this.props.stateValue?.value?.getActiveView();
             const allLayers = this.props.stateValue?.value?.getAllLayers();
-            const jimuLayerView = this.props.stateValue?.value?.getAllJimuLayerViews();
+            const jimuLayerView = activeView?.jimuLayerViews
             const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
             const numberOfAttribute = this.props.stateValue?.value?.numberOfAttribute??{};
             if (
@@ -260,7 +259,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                 helper.openSideBar([],{});
                 this.props.dispatch(appActions.widgetStatePropChange("value","numberOfAttribute",{}));
                 this.props.dispatch(appActions.widgetStatePropChange("value","checkedLayers",[]));
-                const jimuLayerViews = this.props.stateValue.value.getAllJimuLayerViews();
+                // const jimuLayerViews = this.props.stateValue.value.getAllJimuLayerViews();
+                const jimuLayerViews = activeView?.jimuLayerViews;
                 helper.unhighlightAllLayer(jimuLayerViews);
             }else{
                 this.props.dispatch(appActions.widgetStatePropChange("value","showAlert",true));
@@ -271,6 +271,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
     }
 
     tabsClose(e,noControlTable = false){
+        const activeView = this.props.stateValue?.value?.getActiveView();
         this.optionColorCleanSelected();
         const tabs = this.state.tabs;
         const arrayTable = this.arrayTable;
@@ -298,7 +299,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                     table = arrayTable[tableIndex];
                 }
             }
-            const jimuLayerViews = this.props.stateValue?.value?.getAllJimuLayerViews();
+            // const jimuLayerViews = this.props.stateValue?.value?.getAllJimuLayerViews();
+            const jimuLayerViews = activeView?.jimuLayerViews 
             const numberOfAttribute = this.props.stateValue?.value?.numberOfAttribute??{};
             const checkedLayers = this.props.stateValue?.value?.checkedLayers??[];
             if (table && table.layer){
@@ -340,6 +342,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
     }
 
     optionCloseAllTabs(){
+        const activeView = this.props.stateValue?.value?.getActiveView();
         const tabs = this.state.tabs;
         this.arrayTable = [];
         this.setState({
@@ -348,7 +351,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
         });
         this.props.dispatch(appActions.widgetStatePropChange("value","numberOfAttribute",{}));
         this.props.dispatch(appActions.widgetStatePropChange("value","checkedLayers",[]));
-        const jimuLayerViews = this.props.stateValue.value.getAllJimuLayerViews();
+        // const jimuLayerViews = this.props.stateValue.value.getAllJimuLayerViews();
+        const jimuLayerViews = activeView?.jimuLayerViews;
         helper.unhighlightAllLayer(jimuLayerViews);
         helper.deactivateAllLayer(jimuLayerViews)
         //TODO MIGLIORARE
@@ -378,10 +382,12 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
     optionColorFound(event){
         //event.preventDefault();
         //event.stopPropagation();
+        const activeView = this.props.stateValue?.value?.getActiveView();
         const activeTable = this.getActiveTable();
         const uniqueValuesInfosSave = this.uniqueValuesInfosSave;
         const saveOldRenderer = this.saveOldRenderer;
-        const jimuLayerViews = this.props.stateValue.value.getAllJimuLayerViews();
+        // const jimuLayerViews = this.props.stateValue.value.getAllJimuLayerViews();
+        const jimuLayerViews = activeView?.jimuLayerViews;
         if(activeTable && jimuLayerViews){
             let arrayItemSelected = activeTable.highlightIds
             if(arrayItemSelected){

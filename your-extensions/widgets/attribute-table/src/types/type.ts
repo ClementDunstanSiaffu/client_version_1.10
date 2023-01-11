@@ -14,7 +14,6 @@ export type stateValueType = {
                 valueBuffer?:any
             },
             getActiveView:()=>any,
-            getAllJimuLayerViews:()=>any,
             checkedLayers:string[],
             numberOfAttribute:{[id:string]:number},
             createTable:boolean,
