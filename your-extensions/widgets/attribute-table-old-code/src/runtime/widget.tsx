@@ -81,7 +81,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>, any
 
     componentDidUpdate(prevProps: Readonly<AllWidgetProps<any>>, prevState: Readonly<any>, snapshot?: any) {
         //@ts-ignore
-        if(this.props.hasOwnProperty("stateValue") && this.props.stateValue[Object.keys(this.props.stateValue)[0]]?.layerOpen){
+        if(this.props.hasOwnProperty("stateValue") && this.props.stateValue?.value?.layerOpen){
             const newTimeReceive = new Date().getTime();
             if(newTimeReceive - this.filterTimeReceiveData < 5000){
                 return;
@@ -89,11 +89,11 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>, any
                 this.filterTimeReceiveData = newTimeReceive;
             }
             //@ts-ignore
-            const layerOpen = this.props.stateValue[Object.keys(this.props.stateValue)[0]].layerOpen
-            const jimuMapView = layerOpen.activeView()
+            const layerOpen = this.props.stateValue?.value.layerOpen
+            const jimuMapView = layerOpen.activeView();
             if(jimuMapView){
                 //@ts-ignore
-                const layeOpen = this.props.stateValue[Object.keys(this.props.stateValue)[0]]?.layerOpen
+                const layeOpen = this.props.stateValue?.value.layerOpen
                 this.createListTable(layeOpen);
                 // this.createListTable(this.props.stateProps.layerOpen);
             }
@@ -116,9 +116,10 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>, any
         this.tabs = [];
         this.arrayTable = [];
         const jimuMapView = layerOpen.activeView();
-        for(let i=0;i<jimuMapView.view.map.allLayers.items.length;i++){
-            const f = jimuMapView.view.map.allLayers.items[i];
-            if(f.type==="feature" && layerOpen.listServices.indexOf(f.id) !== -1){
+        const allCheckedLayers = layerOpen.getAllLayers();
+        for(let i=0;i<allCheckedLayers.length;i++){
+            const f = allCheckedLayers[i];
+            if(f.type==="feature"){
                 if(f.sublayers){
                     for(let j=0;i<f.sublayers?.items?.length;i++){
                         const fs = f.sublayers?.items[j];
@@ -155,6 +156,45 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>, any
 
             }
         }
+        // for(let i=0;i<jimuMapView.view.map.allLayers.items.length;i++){
+        //     const f = jimuMapView.view.map.allLayers.items[i];
+        //     if(f.type==="feature" && layerOpen.listServices.indexOf(f.id) !== -1){
+        //         if(f.sublayers){
+        //             for(let j=0;i<f.sublayers?.items?.length;i++){
+        //                 const fs = f.sublayers?.items[j];
+        //                 this.tabs.push(
+        //                     <Tab closeable id={"tab-"+fs.uid} title={f.title + " - "+ fs.title}>
+        //                         <div id={"container-"+fs.uid} className="tabClassControl"></div>
+        //                     </Tab>
+        //                 );
+
+        //                 this.createTable(fs,layerOpen,"tab-"+fs.uid).then((featureTable)=>{
+        //                     if(!featureTable){
+        //                         console.log("Table not results: "+fs.title);
+        //                     }else{
+        //                         console.log("Table Loaded: "+fs.title);
+        //                     }
+        //                 });
+        //             }
+        //         }else{
+        //             if(i === 0) this.defaultValue = "tab-"+f.uid;
+        //             this.tabs.push(
+        //                 <Tab closeable id={"tab-"+f.uid} title={f.title}>
+        //                     <div id={"container-"+f.uid} className="tabClassControl"></div>
+        //                 </Tab>
+        //             );
+
+        //             this.createTable(f,layerOpen,"tab-"+f.uid).then((featureTable)=>{
+        //                 if(!featureTable){
+        //                     console.log("Table not results: "+f.title);
+        //                 }else{
+        //                     console.log("Table Loaded: "+f.title);
+        //                 }
+        //             });
+        //         }
+
+        //     }
+        // }
         this.setState({
             geometryFilter: layerOpen.geometry,
             listServices: layerOpen.listServices
@@ -265,7 +305,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>, any
 
             const results = await layer.queryFeatures(query);
             let features = results.features;
-            console.log(features,"features");
             if(features?.length){
                 this.saveFeatures[layer.uid] = features;
                 const featureTable = this.createFeatureTable(layer,pass);

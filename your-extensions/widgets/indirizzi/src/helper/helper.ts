@@ -1,4 +1,8 @@
 
+import Query from "esri/rest/support/Query";
+import query from 'esri/rest/query';
+import FeatureLayer from "esri/layers/FeatureLayer";
+
 
 class Helper {
 
@@ -12,6 +16,16 @@ class Helper {
             }
         }
         return serviceName;
+    }
+
+    queryFeatureService = (url:string)=>{
+        // const queryObject = new Query();
+        // queryObject.returnGeometry = true;
+        // queryObject.where = "1=1"
+        // const results = await query.executeQueryJSON(url, queryObject);
+        const layer = new FeatureLayer({url:url,outFields:['*']});
+        return layer
+
     }
 }
 

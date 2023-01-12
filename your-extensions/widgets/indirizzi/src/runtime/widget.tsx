@@ -13,13 +13,16 @@ import coordinateFormatter from "esri/geometry/coordinateFormatter";
 import webMercatorUtils from "esri/geometry/support/webMercatorUtils";
 import FeatureLayer from 'esri/layers/FeatureLayer';
 import LayerView from 'esri/views/layers/LayerView';
+import helper from '../helper/helper';
 
 export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>, any> {
 
     static activeView = null;
     
-    graphicLayerFound = new GraphicsLayer({id:"indirizzi-found-sketch",listMode:"hide",visible:true});
-    graphicLayerSelected = new GraphicsLayer({id:"indirizzi-selected-sketch",listMode:"hide",visible:true});
+    // graphicLayerFound = new GraphicsLayer({id:"indirizzi-found-sketch",listMode:"hide",visible:true});
+    graphicLayerFound = new GraphicsLayer({listMode:"hide",visible:true});
+    graphicLayerSelected = new GraphicsLayer({listMode:"hide",visible:true});
+    // graphicLayerSelected = new GraphicsLayer({id:"indirizzi-selected-sketch",listMode:"hide",visible:true});
 
     symbolFound = {
         type: "simple-fill",
@@ -56,7 +59,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
           valueBufferCoord: 0,
           geometry:null,
           typeSelected:null,
-          listServices: []
+          listServices: [],
+          layersIds:[]
       };
 
       this._viewLabels = this._viewLabels.bind(this);
@@ -73,10 +77,40 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       this.onClickResearchfromAddress = this.onClickResearchfromAddress.bind(this);
       this.onClickResearchfromCoord = this.onClickResearchfromCoord.bind(this);
 
+      this.getAllCheckedLayers = this.getAllCheckedLayers.bind(this);
+
     }
 
     getActiveView(){
         return Widget.activeView;
+    }
+
+    getAllCheckedLayers(){
+        const activeView = Widget.activeView;
+        let allCheckedLayers = [];
+        if (activeView){
+            const allLayers = activeView.view.map.allLayers.items;
+            const layersIds = this.state.layersIds;
+            const listServices = this.state.listServices;
+            if (layersIds.length){
+                for (let i = 0;i < layersIds.length;i++){
+                    const currentLayerIds = layersIds[i];
+                    const serviceKey = currentLayerIds.serviceKey
+                    if (listServices.includes(serviceKey)){
+                        const layerIds = currentLayerIds.layerIds;
+                        for (let j = 0;j < allLayers.length;j++){
+                            const currentLayer = allLayers[i];
+                            if (layerIds.includes(currentLayer.id)){
+                                // allCheckedLayers.push(currentLayer);
+                            }else{
+                                allCheckedLayers = allLayers;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return allCheckedLayers;
     }
     
     getFeatureLayer (){
@@ -90,6 +124,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
             jmv.view.map.add(this.graphicLayerSelected);
             Widget.activeView = jmv;
             let arraySup = [];
+            let layersIds = []
 
             // const featureLayer = this.getFeatureLayer();
             // const layerViewProps = new LayerView({layer:featureLayer,visible:true,spatialReferenceSupported:true})
@@ -103,6 +138,27 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                     label:services[key].title,
                     value:key
                 })
+                const listIds = services[key].layerListIds;
+                let availableIds = [];
+                if (listIds.length){
+                    
+                    for (let i = 0;i < listIds.length;i++){
+                        const url = services[key].url??" ";
+                        const newUrl = url + `/${listIds[i]}`
+                        const layer = helper.queryFeatureService(newUrl);
+                        if (layer.id){
+                            availableIds.push(layer.id);
+                            // layersIds.push(layer.id);
+                        }
+                    }
+                    const object = {serviceKey:key,layerIds:availableIds}
+                    layersIds.push(object);
+                  
+                }
+                availableIds = [];
+                // const url = services[key].url??" ";
+                // const newUrl = url + "/0"
+                // helper.queryFeatureService(url)
             })
 
             // jmv.view.map.allLayers.forEach((f, index) =>{
@@ -187,6 +243,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                 arrayLayer: arraySup,
                 jimuMapView: jmv,
                 searchWidget:searchWidget,
+                layersIds:layersIds
                 // sketchWidget:sketch
             });
         }
@@ -286,9 +343,25 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         let arrayGeometry = [];
         //TODO PRENDERE GEOMETRIA
         this.graphicLayerFound.graphics.forEach(g=>{
-            // @ts-ignore
-            g.geometry = geometryEngine.buffer(g.geometry, this.state.valueBufferAddress, "meters");
-            arrayGeometry.push(g.geometry);
+            const layersIds = this.state.layersIds;
+            if (layersIds.length){
+                for (let i = 0;i < layersIds.length;i++){
+                    const currentLayerid = layersIds[i];
+                    const serviceKey = currentLayerid.serviceKey;
+                    const listServices = this.state.listServices;
+                    if (listServices.includes(serviceKey)){
+                        const listIds = currentLayerid.layerIds;
+                        if (!listIds.includes(g.layer.id)){
+                            // @ts-ignore
+                            g.geometry = geometryEngine.buffer(g.geometry, this.state.valueBufferAddress, "meters");
+                            arrayGeometry.push(g.geometry);
+                        }
+                    }
+                }
+            }
+            // // @ts-ignore
+            // g.geometry = geometryEngine.buffer(g.geometry, this.state.valueBufferAddress, "meters");
+            // arrayGeometry.push(g.geometry);
         });
         //controllo errori
         let arrayErrors = [];
@@ -313,16 +386,18 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                     }
                 }
             });
+            const idWidgetTable = this.props.config.settings.idWidgetTable !== " " ? this.props.config.settings.idWidgetTable :"value"
             //mando layerid ad TableList
             this.props.dispatch(
                 appActions.widgetStatePropChange(
-                    this.props.config.settings.idWidgetTable,
+                    "value",
                     "layerOpen",
                     {
                         typeSelected:this.state.typeSelected,
                         geometry:this.state.geometry.toJSON(),
                         listServices:this.state.listServices,
-                        activeView:this.getActiveView
+                        activeView:this.getActiveView,
+                        getAllLayers:this.getAllCheckedLayers
                     }
                 )
             );
