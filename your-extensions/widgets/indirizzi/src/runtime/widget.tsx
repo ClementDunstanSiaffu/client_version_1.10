@@ -101,9 +101,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                         for (let j = 0;j < allLayers.length;j++){
                             const currentLayer = allLayers[i];
                             if (layerIds.includes(currentLayer.id)){
-                                // allCheckedLayers.push(currentLayer);
-                            }else{
-                                allCheckedLayers = allLayers;
+                                allCheckedLayers.push(currentLayer);
                             }
                         }
                     }
@@ -144,12 +142,25 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                     
                     for (let i = 0;i < listIds.length;i++){
                         const url = services[key].url??" ";
-                        const newUrl = url + `/${listIds[i]}`
+                        const newUrl = `${url}/${listIds[i]}`
                         const layer = helper.queryFeatureService(newUrl);
-                        if (layer.id){
-                            availableIds.push(layer.id);
-                            // layersIds.push(layer.id);
+                        if (layer){
+                            layer.load()
+                            .then((loadedLayer)=>{
+                                if (loadedLayer.id && loadedLayer.geometryType === "polygon"){
+                                    availableIds.push(layer?.id);
+                                }
+                            })
+                            .catch((err)=>{})
                         }
+                    
+                        // console.log(layer?.geometryType,layer,"check layer geometry")
+                        // //@ts-ignore
+                        // if (layer?.id && layer?.geometryType === "polygon"){
+                        //      //@ts-ignore
+                           
+                        //     // layersIds.push(layer.id);
+                        // }
                     }
                     const object = {serviceKey:key,layerIds:availableIds}
                     layersIds.push(object);
@@ -341,6 +352,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
         //parametri form
         let arrayGeometry = [];
+        let configErrors = [];
         //TODO PRENDERE GEOMETRIA
         this.graphicLayerFound.graphics.forEach(g=>{
             const layersIds = this.state.layersIds;
@@ -351,10 +363,12 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                     const listServices = this.state.listServices;
                     if (listServices.includes(serviceKey)){
                         const listIds = currentLayerid.layerIds;
-                        if (!listIds.includes(g.layer.id)){
+                        if (listIds.includes(g.layer.id)){
                             // @ts-ignore
                             g.geometry = geometryEngine.buffer(g.geometry, this.state.valueBufferAddress, "meters");
                             arrayGeometry.push(g.geometry);
+                        }else{
+                            configErrors.push("Layer id was not found in config file")
                         }
                     }
                 }
@@ -371,6 +385,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         else arrayErrors.push("Seleziona una geometria in mappa");
         if(!this.state.listServices.length) arrayErrors.push("Seleziona almeno un servizio");
         if(!this.state.typeSelected) arrayErrors.push("Seleziona una tipologia di selezione");
+        if (!arrayGeometry.length && configErrors.length > 0) arrayErrors = configErrors
 
         this.setState({
             errorMessage:arrayErrors.join()

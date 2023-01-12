@@ -23,9 +23,13 @@ class Helper {
         // queryObject.returnGeometry = true;
         // queryObject.where = "1=1"
         // const results = await query.executeQueryJSON(url, queryObject);
-        const layer = new FeatureLayer({url:url,outFields:['*']});
-        return layer
-
+        try{
+            const layer = new FeatureLayer({url:url});
+            return layer
+        }
+        catch(err){
+            return null;
+        }
     }
 }
 
