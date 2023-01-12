@@ -14,6 +14,8 @@ import webMercatorUtils from "esri/geometry/support/webMercatorUtils";
 import FeatureLayer from 'esri/layers/FeatureLayer';
 import LayerView from 'esri/views/layers/LayerView';
 import helper from '../helper/helper';
+import Extent from 'esri/geometry/Extent';
+import Polygon from 'esri/geometry/Polygon';
 
 export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>, any> {
 
@@ -60,7 +62,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
           geometry:null,
           typeSelected:null,
           listServices: [],
-          layersIds:[]
+          layersIds:[],
+          searchedLayers:[]
       };
 
       this._viewLabels = this._viewLabels.bind(this);
@@ -136,37 +139,37 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                     label:services[key].title,
                     value:key
                 })
-                const listIds = services[key].layerListIds;
-                let availableIds = [];
-                if (listIds.length){
+                // const listIds = services[key].layerListIds;
+                // let availableIds = [];
+                // if (listIds.length){
                     
-                    for (let i = 0;i < listIds.length;i++){
-                        const url = services[key].url??" ";
-                        const newUrl = `${url}/${listIds[i]}`
-                        const layer = helper.queryFeatureService(newUrl);
-                        if (layer){
-                            layer.load()
-                            .then((loadedLayer)=>{
-                                if (loadedLayer.id && loadedLayer.geometryType === "polygon"){
-                                    availableIds.push(layer?.id);
-                                }
-                            })
-                            .catch((err)=>{})
-                        }
+                    // for (let i = 0;i < listIds.length;i++){
+                    //     // const url = services[key].url??" ";
+                    //     // const newUrl = `${url}/${listIds[i]}`
+                    //     // const layer = helper.queryFeatureService(newUrl);
+                    //     // if (layer){
+                    //     //     // layer.load()
+                    //     //     // .then((loadedLayer)=>{
+                    //     //         if (layer.id){
+                    //     //             availableIds.push(layer?.id);
+                    //     //         }
+                    //     //     // })
+                    //     //     // .catch((err)=>{})
+                    //     // }
                     
-                        // console.log(layer?.geometryType,layer,"check layer geometry")
-                        // //@ts-ignore
-                        // if (layer?.id && layer?.geometryType === "polygon"){
-                        //      //@ts-ignore
+                    //     // console.log(layer?.geometryType,layer,"check layer geometry")
+                    //     // //@ts-ignore
+                    //     // if (layer?.id && layer?.geometryType === "polygon"){
+                    //     //      //@ts-ignore
                            
-                        //     // layersIds.push(layer.id);
-                        // }
-                    }
-                    const object = {serviceKey:key,layerIds:availableIds}
-                    layersIds.push(object);
+                    //     //     // layersIds.push(layer.id);
+                    //     // }
+                    // }
+                    // const object = {featureServer:services[key].url,layerIds:availableIds}
+                    // layersIds.push(object);
                   
-                }
-                availableIds = [];
+                // }
+                // availableIds = [];
                 // const url = services[key].url??" ";
                 // const newUrl = url + "/0"
                 // helper.queryFeatureService(url)
@@ -222,14 +225,20 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
             //     outFields: ["*"],
             // }]
 
+
             const searchWidget = new Search({
                 view: jmv.view,
+                resultGraphicEnabled:true,
                 // sources:sources,
                 container: "search-widget-address"//TODO migliorare senza id cablato
             });
 
             searchWidget.on("select-result", (event)=>{
                 if(event && event.result && event.result.feature){
+                    jmv.selectFeaturesByGraphic(event.result.feature,"within").then((results)=>{
+                        const searchedLayers = helper.getSelectedLayerFromSearch(results);
+                        this.setState({searchedLayers:searchedLayers})
+                    })
                     jmv.view.graphics.removeAll();
                     this.graphicLayerFound.removeAll();
 
@@ -355,24 +364,50 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         let configErrors = [];
         //TODO PRENDERE GEOMETRIA
         this.graphicLayerFound.graphics.forEach(g=>{
-            const layersIds = this.state.layersIds;
-            if (layersIds.length){
-                for (let i = 0;i < layersIds.length;i++){
-                    const currentLayerid = layersIds[i];
-                    const serviceKey = currentLayerid.serviceKey;
-                    const listServices = this.state.listServices;
-                    if (listServices.includes(serviceKey)){
-                        const listIds = currentLayerid.layerIds;
-                        if (listIds.includes(g.layer.id)){
-                            // @ts-ignore
+            const services = this.props.config.services;
+            const serviceKeys = Object.keys(services);
+            if (serviceKeys.length){
+                for (let i = 0;i < serviceKeys.length;i++){
+                    const currentService = services[serviceKeys[i]];
+                    const searchedLayers = this.state.searchedLayers;
+                    if (searchedLayers.length){
+                        const item = searchedLayers.find((item)=>{
+                            if (
+                                    item.featureServer === currentService.url && 
+                                    currentService.layerListIds.includes(item.id)
+                                ){
+                                    return item;
+                                }
+                        })
+                        if (Boolean(item)){
+                            //@ts-ignore
                             g.geometry = geometryEngine.buffer(g.geometry, this.state.valueBufferAddress, "meters");
                             arrayGeometry.push(g.geometry);
-                        }else{
-                            configErrors.push("Layer id was not found in config file")
                         }
                     }
                 }
             }
+
+
+            // const layersIds = this.state.layersIds;
+            // if (layersIds.length){
+            //     for (let i = 0;i < layersIds.length;i++){
+            //         const currentLayerid = layersIds[i];
+            //         const serviceKey = currentLayerid.serviceKey;
+            //         const listServices = this.state.listServices;
+            //         if (listServices.includes(serviceKey)){
+            //             const listIds = currentLayerid.layerIds;
+            //             if (listIds.includes(g.layer.id)){
+            //                 // @ts-ignore
+            //                 g.geometry = geometryEngine.buffer(g.geometry, this.state.valueBufferAddress, "meters");
+            //                 arrayGeometry.push(g.geometry);
+            //             }else{
+            //                 configErrors.push("Layer id was not found in config file")
+            //             }
+            //         }
+            //     }
+            // }
+
             // // @ts-ignore
             // g.geometry = geometryEngine.buffer(g.geometry, this.state.valueBufferAddress, "meters");
             // arrayGeometry.push(g.geometry);

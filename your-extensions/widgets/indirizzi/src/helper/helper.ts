@@ -31,6 +31,23 @@ class Helper {
             return null;
         }
     }
+
+    getSelectedLayerFromSearch = (results:any[])=>{
+        const selectedIds = [];
+        if (results.length > 0){
+            for (let i =0;i < results.length;i++){
+                const innerResults = results[i];
+                if (innerResults.length){
+                    for (let j = 0;j < innerResults.length;j++){
+                        const layer = innerResults[j].layer;
+                        const object = {featureServer:layer.url,id:layer.layerId}
+                        selectedIds.push(object)
+                    }
+                }
+            }
+        }
+        return selectedIds;
+    }
 }
 
 export default new Helper();
