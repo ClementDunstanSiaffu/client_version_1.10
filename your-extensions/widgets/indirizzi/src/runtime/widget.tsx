@@ -235,8 +235,9 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
             searchWidget.on("select-result", (event)=>{
                 if(event && event.result && event.result.feature){
-                    jmv.selectFeaturesByGraphic(event.result.feature,"within").then((results)=>{
+                    jmv.selectFeaturesByGraphic(event.result.feature,"contains").then((results)=>{
                         const searchedLayers = helper.getSelectedLayerFromSearch(results);
+                        console.log(results,"check results")
                         this.setState({searchedLayers:searchedLayers})
                     })
                     jmv.view.graphics.removeAll();
@@ -370,6 +371,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                 for (let i = 0;i < serviceKeys.length;i++){
                     const currentService = services[serviceKeys[i]];
                     const searchedLayers = this.state.searchedLayers;
+                    console.log(searchedLayers,currentService)
                     if (searchedLayers.length){
                         const item = searchedLayers.find((item)=>{
                             if (
