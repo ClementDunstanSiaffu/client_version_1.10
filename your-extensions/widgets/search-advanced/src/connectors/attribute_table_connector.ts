@@ -45,13 +45,27 @@ class AttributeTableConnector {
     init(obj:initObjType){  
 
         const results = obj.results;
-        const createTable = obj.createTable??true;
-        const isLayerChecked = obj.isLayerChecked??false;
         const allCheckedLayers = obj.allCheckedLayers;
-        const checkedLayers = obj.checkedLayers;
-        const numberOfAttributes = obj.numberOfAttributes;
-        const layerOpen = obj.layerOpen;
-
+        let createTable = true;
+        let isLayerChecked = false;
+        let checkedLayers = null;
+        let numberOfAttributes = null;
+        let layerOpen = null;
+        if (obj.hasOwnProperty("createTable")){
+            createTable = obj.createTable;
+        }
+        if (obj.hasOwnProperty("isLayerChecked")){
+            isLayerChecked = obj.isLayerChecked 
+        }
+        if (obj.hasOwnProperty("checkedLayers")){
+            checkedLayers = obj.checkedLayers 
+        }
+        if (obj.hasOwnProperty("numberOfAttributes")){
+            numberOfAttributes = obj.numberOfAttributes 
+        }
+        if (obj.hasOwnProperty("layerOpen")){
+            layerOpen = obj.layerOpen 
+        }
         this.createTable = createTable;
         this.isLayerChecked = isLayerChecked;
         this.setCheckedLayers(allCheckedLayers,checkedLayers);
@@ -85,13 +99,13 @@ class AttributeTableConnector {
         let checkedLayersArr = [];
         if (allCheckedLayers){
             if (this.isObject(allCheckedLayers)){
-                checkedLayers.push(allCheckedLayers.id);
+                checkedLayersArr.push(allCheckedLayers.id);
             }
             if (this.isArray(allCheckedLayers)){
-                checkedLayers = [...checkedLayersArr,this.loopLayerGetIds(allCheckedLayers)];
+                checkedLayersArr = [...checkedLayersArr,this.loopLayerGetIds(allCheckedLayers)];
             }
         }
-        this.checkedLayers = checkedLayers;
+        this.checkedLayers = checkedLayersArr;
     }
 
     setAllCheckedLayers = (allCheckedLayers:any)=>{

@@ -307,11 +307,11 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   async onClickViewTable (e,field:string) {
     this.graphicLayerSelected.removeAll();
     const queryObject = new Query();
-    // queryObject.where = `OBJECTID = ${e.target.id}`;----TODO
-    queryObject.where = `OBJECTID = ${e.target.id}`;
+    // queryObject.where = `OBJECTID = ${e.target.id}`;---TODO
+    queryObject.where = `FID = ${e.target.id}`;
     queryObject.returnGeometry = true;
     //@ts-ignore
-    queryObject.outFields = this.props.config[field]?.outFields ? this.props.config[field].outFields : '*'
+    queryObject.outFields = this.props.config[field]?.outFields ? this.props.config[field].outFields : ['*']
     const results = await query.executeQueryJSON(this.props.config.searchItems.url, queryObject);
     if(results && results.features?.length){
       const feature = results.features[0];

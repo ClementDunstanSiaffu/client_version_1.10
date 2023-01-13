@@ -36,7 +36,7 @@ export default class AmbitoTab extends React.PureComponent<any,any>{
         const queryObject = new Query();
         //TODO
         // queryObject.where = `IDAMBITO = "${e.target.value}"`;
-        queryObject.where = `OBJECTID = ${e.target.value}`;
+        queryObject.where = `FID = ${e.target.value}`;
         queryObject.returnGeometry = true;
         // @ts-expect-error
         queryObject.outFields = '*';
@@ -46,26 +46,29 @@ export default class AmbitoTab extends React.PureComponent<any,any>{
           // results.features.sort(function (a, b) {
           //   return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1))
           // })
-    
-          let markerSymbol = {
-            type: "simple-marker", 
-            color: [0, 0, 0,0.5],
-            size:"50px",
-            outline:{
-              color:"transparent",
-              width:0
-            }
-          };
           const feature = results.features;
           const totalpolygonGraphic = [];
           if (feature.length){
             feature.forEach((el,i)=>{
                 const polygon = helper.returnGraphicsGeometry(el);
-                const polygonGraphic = new Graphic({geometry: polygon,symbol: markerSymbol});
+                let symbol = searchWidget.symbolSelected
+                if (polygon.type === "point"){
+                  symbol = {
+                    type: "simple-marker", 
+                    color:[51, 51, 204, 0.5],
+                    size:"100px",
+                    outline:{
+                      color:"transparent",
+                      width:0
+                    }
+                  }
+                }
+                const polygonGraphic = new Graphic({geometry: polygon,symbol:symbol});
                 searchWidget.graphicLayerFound.add(polygonGraphic);
                 totalpolygonGraphic.push(polygonGraphic);
             })
             if (totalpolygonGraphic.length){
+              console.log("go to")
               jimuMapView.view.goTo({center:totalpolygonGraphic});
               searchWidget.setLocatingPostion(false,false);
             }
@@ -107,7 +110,7 @@ export default class AmbitoTab extends React.PureComponent<any,any>{
                   {listAmbiti.length > 0 && 
                     <Select onChange={this.onChangeSelectAmbiti} placeholder="Seleziona un comune">
                       {listAmbiti.map((el, i) => {
-                        return <Option value={el.attributes.OBJECTID}>{el.attributes[Object.keys(el.attributes)[1]]}</Option>
+                        return <Option value={el.attributes.FID}>{el.attributes[Object.keys(el.attributes)[1]]}</Option>
                         //TODO-require vpn 
                         // return <Option value={el.attributes.IDAMBITO}>
                         //   {el.attributes.NOMEAMBITO}

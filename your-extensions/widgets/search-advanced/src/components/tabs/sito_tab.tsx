@@ -25,7 +25,6 @@ export default class SitoTab extends React.PureComponent<any,any>{
     }
 
     async onChangeSelectSTO (e) {
-
         const searchWidget = this.context?.parent;
         const jimuMapView = this.context?.jimuMapView;
         const searchSTO = this.context?.searchSTO
@@ -35,32 +34,37 @@ export default class SitoTab extends React.PureComponent<any,any>{
         const queryObject = new Query();
         //TODO
         // queryObject.where = `IDCOMPARTIMENTO = ${e.target.value}`;
-        queryObject.where = `OBJECTID = ${e.target.value}`;
+        // queryObject.where = `OBJECTID = ${e.target.value}`;
+        queryObject.where = `FID = ${e.target.value}`
         queryObject.returnGeometry = true;
         // @ts-expect-error
         queryObject.outFields = '*';
         try{
           const results = await query.executeQueryJSON(searchSTO.url, queryObject);
+          console.log(results,"check results")
             //---TODO ---//
           // results.features.sort(function (a, b) {
           //   return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1));
           // })
     
-          let markerSymbol = {
-            type: "simple-marker", 
-            color: [0, 0, 0,0.5],
-            size:"50px",
-            outline:{
-              color:"transparent",
-              width:0
-            }
-          };
           const feature = results.features;
           const totalpolygonGraphic = []
           if (feature?.length){
             feature.forEach((el,i)=>{
-                const polygon = helper.returnGraphicsGeometry(el)
-                const polygonGraphic = new Graphic({geometry: polygon,symbol: markerSymbol});
+                const polygon = helper.returnGraphicsGeometry(el);
+                let symbol = searchWidget.symbolSelected
+                if (polygon.type === "point"){
+                  symbol = {
+                    type: "simple-marker", 
+                    color:[51, 51, 204, 0.5],
+                    size:"100px",
+                    outline:{
+                      color:"transparent",
+                      width:0
+                    }
+                  }
+                } 
+                const polygonGraphic = new Graphic({geometry: polygon,symbol: symbol});
                 searchWidget.graphicLayerFound.add(polygonGraphic);
                 totalpolygonGraphic.push(polygonGraphic);
             })
@@ -107,7 +111,7 @@ export default class SitoTab extends React.PureComponent<any,any>{
                                 <Select className="w-100" onChange={this.onChangeSelectSTO} placeholder={this.nls("selectAMunicipality")}>
                                 {
                                     listSTO.map((el, i) => {
-                                    return<Option value={el.attributes.OBJECTID}>
+                                    return<Option value={el.attributes.FID}>
                                             {el.attributes[Object.keys(el.attributes)[1]]}
                                             </Option>
                                             //TODO - it requires where-tech map with the required field

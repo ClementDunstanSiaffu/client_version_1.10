@@ -129,11 +129,19 @@ class Helper{
             //@ts-ignore
             longitude = geometry.longitude;
         }
-        if (longitude && latitude){
-            polygon = {type:type,longitude:longitude,latitude: latitude}
+        if (type === "point"){
+            if (longitude && latitude){
+                polygon = {type:type,longitude:longitude,latitude: latitude}
+            }
         }else{
             polygon = new Polygon(geometry);
         }
+        
+        // if (longitude && latitude){
+        //     polygon = {type:type,longitude:longitude,latitude: latitude}
+        // }else{
+        //     polygon = new Polygon(geometry);
+        // }
         return polygon;
     }
 }

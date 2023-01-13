@@ -7,6 +7,7 @@ import Query from 'esri/rest/support/Query';
 import query from 'esri/rest/query';
 import Graphic from 'esri/Graphic';
 import helper from '../../helper/helper';
+import { symbol } from 'prop-types';
 
 export default class ComuniTab extends React.PureComponent<any,any>{
 
@@ -30,7 +31,8 @@ export default class ComuniTab extends React.PureComponent<any,any>{
 
         searchWidget.graphicLayerFound.removeAll();
         const queryObject = new Query();
-        queryObject.where = `OBJECTID = ${e.target.value}`;
+        // queryObject.where = `OBJECTID = ${e.target.value}`;---TODO
+        queryObject.where = `FID = ${e.target.value}`;
         queryObject.returnGeometry = true;
         queryObject.outFields = searchItems?.outFields;
         searchWidget.setLocatingPostion(true,false);
@@ -38,18 +40,30 @@ export default class ComuniTab extends React.PureComponent<any,any>{
           const results = await query.executeQueryJSON(searchItems?.url, queryObject);
           if(results && results.features?.length){
             const feature = results.features[0];
-            const polygon = helper.returnGraphicsGeometry(feature)      
-            let markerSymbol = {
-              type: "simple-marker", 
-              color: [0, 0, 0,0.5],
-              size:"100px",
-              outline:{
-                color:"transparent",
-                width:0
+            const polygon = helper.returnGraphicsGeometry(feature);
+            let symbol = searchWidget.symbolSelected
+            if (polygon.type === "point"){
+              symbol = {
+                type: "simple-marker", 
+                color:[51, 51, 204, 0.5],
+                size:"100px",
+                outline:{
+                  color:"transparent",
+                  width:0
+                }
               }
-            };
+            }    
+            // let markerSymbol = {
+            //   type: "simple-marker", 
+            //   color: [0, 0, 0,0.5],
+            //   size:"100px",
+            //   outline:{
+            //     color:"transparent",
+            //     width:0
+            //   }
+            // };
     
-            const polygonGraphic = new Graphic({geometry: polygon,symbol: markerSymbol})
+            const polygonGraphic = new Graphic({geometry: polygon,symbol:symbol})
             searchWidget.graphicLayerFound.add(polygonGraphic);
             jimuMapView.view.goTo({center: polygonGraphic});
             searchWidget.setLocatingPostion(false,false);      
@@ -89,11 +103,13 @@ export default class ComuniTab extends React.PureComponent<any,any>{
                    listComuni.length > 0 &&
                       <Select className="w-100" onChange={this.onChangeSelectComuni} placeholder={this.nls("selectAMunicipality")}>
                         {listComuni.map((el, i) => {
-                          return <Option value={el.attributes.OBJECTID}>
-                            {el.attributes[Object.keys(el.attributes)[1]]}
-                            {/*TODO -it requires vpn to work */}
-                            {/* {el.attributes.NOMECOMUNE} */}
-                          </Option>
+                            return <Option value={el.attributes.FID}>
+                             {el.attributes[Object.keys(el.attributes)[1]]}
+                           </Option>
+                           //TODO ---
+                          // return <Option value={el.attributes.OBJECTID}>
+                          //   {el.attributes.NOMECOMUNE}
+                          // </Option>
                         })}
                       </Select>
                   }

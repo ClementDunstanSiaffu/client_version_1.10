@@ -29,10 +29,10 @@ export default function Table (props:propsType) {
                         const itemKeys = Object.keys(sto.attributes);
                         return(
                             <tr className="item-row" key={i}>
-                            <td className="item-table" id={sto.attributes.OBJECTID} onClick={handleClick}>
+                            <td className="item-table" id={sto.attributes.FID} onClick={handleClick}>
                                 {sto.attributes[itemKeys[1]]}
                             </td>
-                            <td className="item-table" id={sto.attributes.OBJECTID} onClick={handleClick}>
+                            <td className="item-table" id={sto.attributes.FID} onClick={handleClick}>
                                 {sto.attributes[itemKeys[2]]}
                             </td>
                             </tr>
