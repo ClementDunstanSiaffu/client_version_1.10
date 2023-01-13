@@ -25,8 +25,6 @@ export default class AmbitoTab extends React.PureComponent<any,any>{
     }
 
     async onChangeSelectAmbiti (e) {
-
-
         const searchWidget = this.context?.parent;
         const jimuMapView = this.context?.jimuMapView;
         const searchAmbiti = this.context?.searchAmbiti

@@ -34,14 +34,12 @@ export default class SitoTab extends React.PureComponent<any,any>{
         const queryObject = new Query();
         //TODO
         // queryObject.where = `IDCOMPARTIMENTO = ${e.target.value}`;
-        // queryObject.where = `OBJECTID = ${e.target.value}`;
         queryObject.where = `FID = ${e.target.value}`
         queryObject.returnGeometry = true;
         // @ts-expect-error
         queryObject.outFields = '*';
         try{
           const results = await query.executeQueryJSON(searchSTO.url, queryObject);
-          console.log(results,"check results")
             //---TODO ---//
           // results.features.sort(function (a, b) {
           //   return ((a.attributes.NOMECOMUNE < b.attributes.NOMECOMUNE) ? -1 : ((a.attributes.NOMECOMUNE == b.attributes.NOMECOMUNE) ? 0 : 1));

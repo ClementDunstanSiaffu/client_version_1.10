@@ -52,17 +52,7 @@ export default class ComuniTab extends React.PureComponent<any,any>{
                   width:0
                 }
               }
-            }    
-            // let markerSymbol = {
-            //   type: "simple-marker", 
-            //   color: [0, 0, 0,0.5],
-            //   size:"100px",
-            //   outline:{
-            //     color:"transparent",
-            //     width:0
-            //   }
-            // };
-    
+            }      
             const polygonGraphic = new Graphic({geometry: polygon,symbol:symbol})
             searchWidget.graphicLayerFound.add(polygonGraphic);
             jimuMapView.view.goTo({center: polygonGraphic});

@@ -136,12 +136,6 @@ class Helper{
         }else{
             polygon = new Polygon(geometry);
         }
-        
-        // if (longitude && latitude){
-        //     polygon = {type:type,longitude:longitude,latitude: latitude}
-        // }else{
-        //     polygon = new Polygon(geometry);
-        // }
         return polygon;
     }
 }
