@@ -22,5 +22,6 @@ export default {
     siteALert:"Selezionare prima lo STO, poi fare click sul comune per evidenziarlo.",
     scopeAlert:"Selezionare prima l'ambito, poi fare click sul comune per evidenziarlo",
     filterByExtention:"Filtro per estensione",
-    filterByValueBuffer:"Filtro per buffer di valori"
+    filterByValueBuffer:"Filtro per buffer di valori",
+    noItemSelected:"Non è stato selezionato alcun elemento sulla mappa"
 }

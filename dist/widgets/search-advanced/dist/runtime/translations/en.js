@@ -22,6 +22,7 @@ System.register([], function (_export) {return {execute: function () {_export({
     "siteALert":"Select the STO first, then click on the municipality to highlight it.",
     "scopeAlert":"Select the scope first, then click on the municipality to highlight it",
     "filterByExtention":"Filter by extention",
-    "filterByValueBuffer":"Filter by value buffer"
+    "filterByValueBuffer":"Filter by value buffer",
+    "noItemSelected":"No items was selected on the map"
 })}}});
 

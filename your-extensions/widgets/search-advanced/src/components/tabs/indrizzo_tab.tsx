@@ -127,7 +127,17 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
           }
 
           Widget.attributeConnector.init(object);
-          Widget.attributeConnector.dispatchingAll();
+          try{
+            Widget.attributeConnector.dispatchingAll();
+          }
+          catch(err){
+            if (arrayErrors.length <= 0){
+              const errorString = this.nls(err);
+              arrayErrors.push(errorString)
+              searchWidget.setState({errorMessage:arrayErrors.join()})
+            }
+          }
+          
         }
     }
 

@@ -208,7 +208,7 @@ class AttributeTableConnector {
                     }
                     return;
                 }
-                throw "There is no number of attributes"
+                throw "noItemSelected"
             }
             if (!layerOpen)throw "There is no layer open"
             if (allCheckedLayers)throw "There is no all checked layers make sure to pass layer"
