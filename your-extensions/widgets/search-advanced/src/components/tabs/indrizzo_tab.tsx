@@ -114,17 +114,33 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
             valueBuffer:valueBuffer,
             graphicsFound:searchWidget.getFoundGeometryArray
           }
-          if (Object.keys(numberOfAttributes).length > 0){
-            searchWidget.props.dispatch(appActions.widgetStatePropChange("value","createTable",true));
-            searchWidget.props.dispatch(appActions.widgetStatePropChange("value","numberOfAttribute",numberOfAttributes));
-            searchWidget.props.dispatch(appActions.widgetStatePropChange("value","layerOpen",layerOpen));
-            searchWidget.props.dispatch(appActions.widgetStatePropChange("value","getAllLayers",searchWidget.getAllCheckedLayers));
-            searchWidget.props.dispatch(appActions.widgetStatePropChange("value","getActiveView",searchWidget.getActiveView));
-            searchWidget.props.dispatch(appActions.widgetStatePropChange("value","getAllJimuLayerViews",searchWidget.getAllJimuLayerViews));
-          }else{
-            searchWidget.props.dispatch(appActions.widgetStatePropChange("value","showAlert",true));
-            searchWidget.setState({errorMessage:"No item was selected"})
+
+          const allCheckedLayers = searchWidget.getAllCheckedLayers()
+
+          const object = {
+            results:results,
+            allCheckedLayers:allCheckedLayers,
+            isLayerChecked:true,
+            checkedLayers:checkedLayers,
+            numberOfAttributes:numberOfAttributes,
+            layerOpen:layerOpen,
+            createTable:true
           }
+
+          Widget.attributeConnector.init(object);
+          Widget.attributeConnector.dispatchingAll();
+
+          // if (Object.keys(numberOfAttributes).length > 0){
+          //   searchWidget.props.dispatch(appActions.widgetStatePropChange("value","createTable",true));
+          //   searchWidget.props.dispatch(appActions.widgetStatePropChange("value","numberOfAttribute",numberOfAttributes));
+          //   searchWidget.props.dispatch(appActions.widgetStatePropChange("value","layerOpen",layerOpen));
+          //   searchWidget.props.dispatch(appActions.widgetStatePropChange("value","getAllLayers",searchWidget.getAllCheckedLayers));
+          //   searchWidget.props.dispatch(appActions.widgetStatePropChange("value","getActiveView",searchWidget.getActiveView));
+          //   searchWidget.props.dispatch(appActions.widgetStatePropChange("value","getAllJimuLayerViews",searchWidget.getAllJimuLayerViews));
+          // }else{
+          //   searchWidget.props.dispatch(appActions.widgetStatePropChange("value","showAlert",true));
+          //   searchWidget.setState({errorMessage:"No item was selected"})
+          // }
         }
     }
 

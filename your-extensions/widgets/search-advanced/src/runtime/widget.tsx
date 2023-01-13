@@ -19,6 +19,7 @@ import ComuniTab from '../components/tabs/comuni_tab'
 import SitoTab from '../components/tabs/sito_tab'
 import AmbitoTab from '../components/tabs/ambito_tab'
 import defaultMessages from './translations/default'
+import AttributeTableConnector from '../connectors/attribute_table_connector'
 
 type stateValueType = {stateValue:{value:{checkedLayers:string[],filterValue:number}}}
 
@@ -30,6 +31,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   static selectedResults = [];
   static currentMapExtent = null;
   static foundGeometry = null;
+  static attributeConnector = null;
 
   graphicLayerFound = new GraphicsLayer({listMode:"hide",visible:true});
   graphicLayerSelected = new GraphicsLayer({listMode:"hide",visible:true});
@@ -221,6 +223,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         searchWidget:searchWidget,
         sketchWidget:sketch
       });
+      Widget.attributeConnector = new AttributeTableConnector(jmv,this);
     }
   }
 

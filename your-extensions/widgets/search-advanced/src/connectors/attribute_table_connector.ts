@@ -12,6 +12,16 @@ type layerOpenType = {
     valueBuffer?:any
 }
 
+type initObjType = {
+    results:any[],
+    allCheckedLayers:any[],
+    isLayerChecked?:boolean,
+    checkedLayers?:string[],
+    numberOfAttributes?:{[key:string]:string},
+    layerOpen?:layerOpenType,
+    createTable?:true
+}
+
 type selectedLayerType = {id:string,attributes:any[]}
 
 class AttributeTableConnector {
@@ -19,11 +29,12 @@ class AttributeTableConnector {
     static activeView:JimuMapView = null;
     static self:any = null;
 
+    allCheckedLayers:any[];
     checkedLayers?:string[];
     numberOfAttributes?:{[key:string]:string};
-    allCheckedLayers?:any[];
     createTable:boolean;
     layerOpen:layerOpenType;
+    isLayerChecked:boolean
 
 
     constructor(activeView:JimuMapView,self:any){
@@ -31,18 +42,20 @@ class AttributeTableConnector {
         AttributeTableConnector.self = self;
     }
 
-    init(
-        layer:any,
-        createTable:boolean,
-        results:any[],
-        allCheckedLayers?:any[],
-        checkedLayers?:string[],
-        numberOfAttributes?:{[key:string]:string},
-        layerOpen?:layerOpenType
-    ){  
+    init(obj:initObjType){  
+
+        const results = obj.results;
+        const createTable = obj.createTable??true;
+        const isLayerChecked = obj.isLayerChecked??false;
+        const allCheckedLayers = obj.allCheckedLayers;
+        const checkedLayers = obj.checkedLayers;
+        const numberOfAttributes = obj.numberOfAttributes;
+        const layerOpen = obj.layerOpen;
+
         this.createTable = createTable;
-        this.setCheckedLayers(layer,checkedLayers);
-        this.setAllCheckedLayers(layer,allCheckedLayers);
+        this.isLayerChecked = isLayerChecked;
+        this.setCheckedLayers(allCheckedLayers,checkedLayers);
+        this.setAllCheckedLayers(allCheckedLayers);
         this.setNumberOfAttributes(results,numberOfAttributes);
         this.setLayerOpen(layerOpen);
     }
@@ -64,48 +77,30 @@ class AttributeTableConnector {
         return idsArray;
     }
 
-    setCheckedLayers = (layer:any,checkedLayers?:string[],)=>{
+    setCheckedLayers = (allCheckedLayers:any,checkedLayers?:string[],)=>{
         if (checkedLayers){
             this.checkedLayers = checkedLayers;
             return;
         }
         let checkedLayersArr = [];
-        if (layer){
-            if (this.isObject(layer)){
-                checkedLayers.push(layer.id);
+        if (allCheckedLayers){
+            if (this.isObject(allCheckedLayers)){
+                checkedLayers.push(allCheckedLayers.id);
             }
-            if (this.isArray(layer)){
-                checkedLayers = [...checkedLayersArr,this.loopLayerGetIds(layer)];
+            if (this.isArray(allCheckedLayers)){
+                checkedLayers = [...checkedLayersArr,this.loopLayerGetIds(allCheckedLayers)];
             }
         }
         this.checkedLayers = checkedLayers;
     }
 
-    setAllCheckedLayers = (layer:any,allCheckedLayers:any[])=>{
-        const activeView = AttributeTableConnector.activeView;
-        if(allCheckedLayers){
-            this.allCheckedLayers = allCheckedLayers;
-            return;
+    setAllCheckedLayers = (allCheckedLayers:any)=>{
+        if (this.isObject(allCheckedLayers)){
+            this.allCheckedLayers = [allCheckedLayers]
         }
-        if (activeView){
-            //@ts-ignore
-            const allMapLayers = activeView.view.map.allLayers?.items;
-            const checkedLayers = this.checkedLayers??[];
-            let newMapLayer = [];
-            if (allMapLayers?.length > 0 && checkedLayers.length > 0){
-                newMapLayer = allMapLayers.reduce((newArray,item)=>{
-                    if (checkedLayers.includes(item.id)){
-                        newArray.push(item);
-                    }
-                    return newArray;
-                },[])
-                this.allCheckedLayers = newMapLayer;
-                return;
-            }
-            this.allCheckedLayers = newMapLayer;
-            return;
+        if (this.isArray(allCheckedLayers)){
+            this.allCheckedLayers = allCheckedLayers
         }
-       this.allCheckedLayers = [layer] 
     }
 
 
@@ -194,6 +189,9 @@ class AttributeTableConnector {
                     props.dispatch(appActions.widgetStatePropChange("value","layerOpen",layerOpen));
                     props.dispatch(appActions.widgetStatePropChange("value","getAllLayers",this.getAllCheckedLayers));
                     props.dispatch(appActions.widgetStatePropChange("value","getActiveView",this.getActiveView));
+                    if (!this.isLayerChecked){
+                        props.dispatch(appActions.widgetStatePropChange("value","checkedLayers",this.checkedLayers));
+                    }
                     return;
                 }
                 throw "There is no number of attributes"
