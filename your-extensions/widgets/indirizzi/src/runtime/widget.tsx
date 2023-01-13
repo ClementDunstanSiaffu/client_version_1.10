@@ -21,10 +21,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
     static activeView = null;
     
-    // graphicLayerFound = new GraphicsLayer({id:"indirizzi-found-sketch",listMode:"hide",visible:true});
-    graphicLayerFound = new GraphicsLayer({listMode:"hide",visible:true});
-    graphicLayerSelected = new GraphicsLayer({listMode:"hide",visible:true});
-    // graphicLayerSelected = new GraphicsLayer({id:"indirizzi-selected-sketch",listMode:"hide",visible:true});
+    graphicLayerFound = new GraphicsLayer({id:"indirizzi-found-sketch",listMode:"hide",visible:true});
+    graphicLayerSelected = new GraphicsLayer({id:"indirizzi-selected-sketch",listMode:"hide",visible:true});
 
     symbolFound = {
         type: "simple-fill",
@@ -127,11 +125,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
             let arraySup = [];
             let layersIds = []
 
-            // const featureLayer = this.getFeatureLayer();
-            // const layerViewProps = new LayerView({layer:featureLayer,visible:true,spatialReferenceSupported:true})
-            // const layerView = new JimuLayerView({layer:featureLayer,view:layerViewProps});
-            // jmv.view.map.add(featureLayer);
-
             const services = this.props.config.services
             const serviceItems = Object.keys(services);
             serviceItems.forEach((key)=>{
@@ -139,97 +132,11 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                     label:services[key].title,
                     value:key
                 })
-                // const listIds = services[key].layerListIds;
-                // let availableIds = [];
-                // if (listIds.length){
-                    
-                    // for (let i = 0;i < listIds.length;i++){
-                    //     // const url = services[key].url??" ";
-                    //     // const newUrl = `${url}/${listIds[i]}`
-                    //     // const layer = helper.queryFeatureService(newUrl);
-                    //     // if (layer){
-                    //     //     // layer.load()
-                    //     //     // .then((loadedLayer)=>{
-                    //     //         if (layer.id){
-                    //     //             availableIds.push(layer?.id);
-                    //     //         }
-                    //     //     // })
-                    //     //     // .catch((err)=>{})
-                    //     // }
-                    
-                    //     // console.log(layer?.geometryType,layer,"check layer geometry")
-                    //     // //@ts-ignore
-                    //     // if (layer?.id && layer?.geometryType === "polygon"){
-                    //     //      //@ts-ignore
-                           
-                    //     //     // layersIds.push(layer.id);
-                    //     // }
-                    // }
-                    // const object = {featureServer:services[key].url,layerIds:availableIds}
-                    // layersIds.push(object);
-                  
-                // }
-                // availableIds = [];
-                // const url = services[key].url??" ";
-                // const newUrl = url + "/0"
-                // helper.queryFeatureService(url)
             })
-
-            // jmv.view.map.allLayers.forEach((f, index) =>{
-            //     if(f.type === "feature"){
-            //         arraySup.push({
-            //             label:f.title,
-            //             value:f.id
-            //         });
-            //     }
-            // });
-
-
-            //TODO -we don't use it now//
-            // const sketch = new Sketch({
-            //     layer: this.graphicLayerFound,
-            //     view: jmv.view,
-            //     creationMode:"single",
-            //     container: "sketch-widget-address",//TODO migliorare senza id cablato
-            //     availableCreateTools:["polygon", "rectangle", "circle","point"],
-            //     visibleElements: {
-            //         selectionTools:{
-            //             "lasso-selection": false
-            //         },
-            //         settingsMenu: false
-            //     }
-            // });
-
-            // sketch.on("create", (event)=>{
-            //     jmv.view.graphics.removeAll();
-            //     this.graphicLayerFound.removeAll();
-
-            //     if (event.state === "complete") {
-            //         const polygonGraphic = new Graphic({
-            //             geometry: event.graphic.geometry,
-            //             symbol: this.symbolFound
-            //         });
-
-            //         this.graphicLayerFound.add(polygonGraphic);
-            //     }
-            // });
-
-            // const sources = [{
-            //     layer:featureLayer,
-            //     maxResults: 5,
-            //     searchFields:featureLayer.displayField,
-            //     displayField:featureLayer.displayField,
-            //     maxSuggestions: 6,
-            //     exactMatch:false,
-            //     minSuggestCharacters:0,
-            //     outFields: ["*"],
-            // }]
-
 
             const searchWidget = new Search({
                 view: jmv.view,
                 resultGraphicEnabled:true,
-                // sources:sources,
                 container: "search-widget-address"//TODO migliorare senza id cablato
             });
 
@@ -237,7 +144,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                 if(event && event.result && event.result.feature){
                     jmv.selectFeaturesByGraphic(event.result.feature,"contains").then((results)=>{
                         const searchedLayers = helper.getSelectedLayerFromSearch(results);
-                        console.log(results,"check results")
                         this.setState({searchedLayers:searchedLayers})
                     })
                     jmv.view.graphics.removeAll();
@@ -306,24 +212,18 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         this.setState(stateNew);
     }
     async onChangeSelectLayer (e,n,s){
-        const view = this.state.jimuMapView.view;
-        // const layer = view.map.allLayers.find((item)=>item.id === n);
         if(e.target.checked){
             const copiedListServices = [...this.state.listServices,n];
             this.setState({listServices:copiedListServices})
-            // this.state.listServices.push(n);
-            // view.goTo(layer.fullExtent)
         }else{
             let index = this.state.listServices.indexOf(n);
             if (index > -1) {
                 const copiedListServices = [...this.state.listServices];
                 copiedListServices.splice(index,1);
                 this.setState({listServices:copiedListServices})
-                // this.state.listServices.splice(index,1);
             }
         }
 
-        // this.setState(this.state);
     }
     onChangeSelectTypeGeometry(e){
         // @ts-ignore
@@ -371,7 +271,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                 for (let i = 0;i < serviceKeys.length;i++){
                     const currentService = services[serviceKeys[i]];
                     const searchedLayers = this.state.searchedLayers;
-                    console.log(searchedLayers,currentService)
                     if (searchedLayers.length){
                         const item = searchedLayers.find((item)=>{
                             if (
@@ -390,29 +289,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                 }
             }
 
-
-            // const layersIds = this.state.layersIds;
-            // if (layersIds.length){
-            //     for (let i = 0;i < layersIds.length;i++){
-            //         const currentLayerid = layersIds[i];
-            //         const serviceKey = currentLayerid.serviceKey;
-            //         const listServices = this.state.listServices;
-            //         if (listServices.includes(serviceKey)){
-            //             const listIds = currentLayerid.layerIds;
-            //             if (listIds.includes(g.layer.id)){
-            //                 // @ts-ignore
-            //                 g.geometry = geometryEngine.buffer(g.geometry, this.state.valueBufferAddress, "meters");
-            //                 arrayGeometry.push(g.geometry);
-            //             }else{
-            //                 configErrors.push("Layer id was not found in config file")
-            //             }
-            //         }
-            //     }
-            // }
-
-            // // @ts-ignore
-            // g.geometry = geometryEngine.buffer(g.geometry, this.state.valueBufferAddress, "meters");
-            // arrayGeometry.push(g.geometry);
         });
         //controllo errori
         let arrayErrors = [];

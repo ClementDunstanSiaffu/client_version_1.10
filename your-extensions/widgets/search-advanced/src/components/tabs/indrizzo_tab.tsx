@@ -95,11 +95,10 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
     
         if(arrayErrors.length === 0 && idWidgetTable !== ""){
     
-          jimuMapView.view.map.allLayers.forEach((f, index) =>{
+          jimuMapView.view.map.allLayers.items.forEach((f, index) =>{
             if(f && f.type==="feature" && checkedLayers.indexOf(f.id) !== -1){
               if(f.labelingInfo?.length){
                 f.labelingInfo[0].symbol.font.family = "Arial";//fix font verdana not in static esri
-                f.labelsVisible = this.state.labelVisible;
               }
             }
           });
@@ -129,18 +128,6 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
 
           Widget.attributeConnector.init(object);
           Widget.attributeConnector.dispatchingAll();
-
-          // if (Object.keys(numberOfAttributes).length > 0){
-          //   searchWidget.props.dispatch(appActions.widgetStatePropChange("value","createTable",true));
-          //   searchWidget.props.dispatch(appActions.widgetStatePropChange("value","numberOfAttribute",numberOfAttributes));
-          //   searchWidget.props.dispatch(appActions.widgetStatePropChange("value","layerOpen",layerOpen));
-          //   searchWidget.props.dispatch(appActions.widgetStatePropChange("value","getAllLayers",searchWidget.getAllCheckedLayers));
-          //   searchWidget.props.dispatch(appActions.widgetStatePropChange("value","getActiveView",searchWidget.getActiveView));
-          //   searchWidget.props.dispatch(appActions.widgetStatePropChange("value","getAllJimuLayerViews",searchWidget.getAllJimuLayerViews));
-          // }else{
-          //   searchWidget.props.dispatch(appActions.widgetStatePropChange("value","showAlert",true));
-          //   searchWidget.setState({errorMessage:"No item was selected"})
-          // }
         }
     }
 
