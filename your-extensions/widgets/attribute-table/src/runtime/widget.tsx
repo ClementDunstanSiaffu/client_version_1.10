@@ -359,7 +359,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
         });
         this.props.dispatch(appActions.widgetStatePropChange("value","numberOfAttribute",{}));
         this.props.dispatch(appActions.widgetStatePropChange("value","checkedLayers",[]));
-        // const jimuLayerViews = this.props.stateValue.value.getAllJimuLayerViews();
         const jimuLayerViews = activeView?.jimuLayerViews;
         helper.unhighlightAllLayer(jimuLayerViews);
         helper.deactivateAllLayer(jimuLayerViews)
