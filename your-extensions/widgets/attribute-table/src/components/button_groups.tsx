@@ -17,7 +17,8 @@ import SelectFilterType from './select_filter';
 type PropsType = {
     parent:Widget,
     selectedColor:string,
-    filterValue:number
+    filterValue:number,
+    showColorButtonGroup:boolean
 }
 
 export default class ButtonGroupComponent extends React.PureComponent<PropsType,any>{
@@ -168,6 +169,7 @@ export default class ButtonGroupComponent extends React.PureComponent<PropsType,
 
         let buttonFilter = this.setButtonFilter();
         const self = this.props?.parent;
+        const showColorButtonGroup = this.props.showColorButtonGroup
 
         return(
             <div className="container-fluid bg-primary h-auto">
@@ -198,7 +200,7 @@ export default class ButtonGroupComponent extends React.PureComponent<PropsType,
                             </DropdownMenu>
                         </Dropdown>
 
-                        <Dropdown direction="down">
+                        {showColorButtonGroup && <Dropdown direction="down">
                             <DropdownButton>
                                 <ColorsOutlined className="mr-2"/> Colore evidenziazione
                             </DropdownButton>
@@ -213,7 +215,7 @@ export default class ButtonGroupComponent extends React.PureComponent<PropsType,
                                     <ClearOutlined className="mr-2"/> Cancella le evidenziazioni
                                 </DropdownItem>
                             </DropdownMenu>
-                        </Dropdown>
+                        </Dropdown>}
 
                         {buttonFilter}
 

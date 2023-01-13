@@ -33,6 +33,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
             selectedColor:" ",
             viewExtent:null,
             features:null,
+            showColorButtonGroup:true
         }
 
         this.tabsClose = this.tabsClose.bind(this);
@@ -205,6 +206,13 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
             }
         },{initial:true})
         this.arrayTable.push(featureTable);
+        let colorButtonGroupStatus = true;
+        if (!highlightIds.length){
+            colorButtonGroupStatus = false;
+        }
+        if (this.state.showColorButtonGroup !== colorButtonGroupStatus){
+            this.setState({showColorButtonGroup:colorButtonGroupStatus});
+        }
         return featureTable;
     }
 
@@ -472,6 +480,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>&stat
                     parent = {this} 
                     selectedColor = {this.state.selectedColor}
                     filterValue = {filterValue}
+                    showColorButtonGroup = {this.state.showColorButtonGroup}
                 />
                 {this.state.tabs.length === 0 ?
                     <div className="text-center container-fluid">
