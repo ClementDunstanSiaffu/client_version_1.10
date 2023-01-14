@@ -212,7 +212,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
           const geometryBuffer: Polygon = geometryEngine.buffer( event.result.feature.geometry, 1, "meters");
           const polygonGraphic = new Graphic({geometry: geometryBuffer,symbol: this.symbolFound});
           this.graphicLayerFound.add(polygonGraphic);
-          this.setState({searchByAddress:true});
+          this.setState({searchByAddress:true,disableButton:false});
         }
       });
   

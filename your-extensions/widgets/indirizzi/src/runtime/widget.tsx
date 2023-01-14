@@ -142,20 +142,25 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
             searchWidget.on("select-result", (event)=>{
                 if(event && event.result && event.result.feature){
-                    jmv.selectFeaturesByGraphic(event.result.feature,"contains").then((results)=>{
-                        const searchedLayers = helper.getSelectedLayerFromSearch(results);
-                        this.setState({searchedLayers:searchedLayers})
-                    })
+                    // jmv.selectFeaturesByGraphic(event.result.feature,"contains").then((results)=>{
+                    //     const searchedLayers = helper.getSelectedLayerFromSearch(results);
+                    //     this.setState({searchedLayers:searchedLayers})
+                    // })
                     jmv.view.graphics.removeAll();
                     this.graphicLayerFound.removeAll();
 
                     //@ts-ignore
-                    const geometryBuffer: Polygon = geometryEngine.buffer( event.result.feature.geometry, 1, "meters");
+                    const geometryBuffer: Polygon = geometryEngine.buffer( event.result.feature.geometry, 1000, "meters");
 
                     const polygonGraphic = new Graphic({
                         geometry: geometryBuffer,
                         symbol: this.symbolFound
                     });
+                    jmv.selectFeaturesByGraphic(polygonGraphic,"contains").then((results)=>{
+                        console.log(results,"check results")
+                        const searchedLayers = helper.getSelectedLayerFromSearch(results);
+                        this.setState({searchedLayers:searchedLayers})
+                    })
 
                     this.graphicLayerFound.add(polygonGraphic);
 
