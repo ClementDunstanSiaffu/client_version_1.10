@@ -76,7 +76,7 @@ class AttributeTableConnector {
 
     isArray = (val)=>Array.isArray(val);
 
-    isObject = (val)=>Object.keys(val).length > 0;
+    isObject = (val)=>Object.keys(val).length > 0 && !Array.isArray(val);
 
     loopLayerGetIds = (layer:any[])=>{
         let idsArray = [];
@@ -100,12 +100,21 @@ class AttributeTableConnector {
         if (allCheckedLayers){
             if (this.isObject(allCheckedLayers)){
                 checkedLayersArr.push(allCheckedLayers.id);
+                this.checkedLayers = checkedLayersArr;
+                return;
             }
             if (this.isArray(allCheckedLayers)){
-                checkedLayersArr = [...checkedLayersArr,this.loopLayerGetIds(allCheckedLayers)];
+                if (checkedLayersArr.length){
+                    checkedLayersArr = [...checkedLayersArr,...this.loopLayerGetIds(allCheckedLayers)];
+                    this.checkedLayers = checkedLayersArr;
+                    return;
+                }else{
+                    checkedLayers = this.loopLayerGetIds(allCheckedLayers);
+                    this.checkedLayers = checkedLayers;
+                    return;
+                }
             }
         }
-        this.checkedLayers = checkedLayersArr;
     }
 
     setAllCheckedLayers = (allCheckedLayers:any)=>{
@@ -167,8 +176,10 @@ class AttributeTableConnector {
         }
         const layersContents = this.getSelectedContentsLayer(results);
         let layerContentsObject = {};
-        for (let i=0;i < layersContents.length;i++){
-             layerContentsObject = {...layerContentsObject,[layersContents[i]?.id]:layersContents[i]?.attributes?.length??0}
+        if (layersContents?.length){
+            for (let i=0;i < layersContents.length;i++){
+                layerContentsObject = {...layerContentsObject,[layersContents[i]?.id]:layersContents[i]?.attributes?.length??0}
+           }
         }
         this.numberOfAttributes = layerContentsObject
     }

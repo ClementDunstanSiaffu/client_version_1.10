@@ -1,0 +1,18 @@
+{
+  "name": "indirizzi_new",
+  "type": "widget",
+  "version": "1.9.0",
+  "dependency": "jimu-arcgis",
+  "exbVersion": "1.9.0",
+  "author": "WhereTech Giuseppe Morsillo",
+  "description": "Widget per la ricerca di indirizzi",
+  "copyright": "",
+  "license": "",
+  "properties": {},
+  "translatedLocales": ["en"],
+  "defaultSize": {
+    "width": 800,
+    "height": 500
+  }
+}
+

@@ -1,0 +1,7 @@
+{
+  "servizi_da_mappa": true,
+  "maxWidthBuffer" : 5000,
+  "slideBuffer" : true,
+  "queryConGeometry" : true,
+  "listvalues": []
+}

@@ -4,26 +4,24 @@ import {IMConfig} from '../config'
 import {Alert, Button, Checkbox, Label, MultiSelect, NumericInput, Option, Select, Slider, Tab, Tabs} from 'jimu-ui'
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import geometryEngine from "esri/geometry/geometryEngine";
-import {JimuLayerView, JimuMapView, JimuMapViewComponent} from 'jimu-arcgis'
+import {JimuMapView, JimuMapViewComponent} from 'jimu-arcgis'
 import {CalciteAccordion, CalciteAccordionItem} from "calcite-components";
 import Graphic from 'esri/Graphic';
 import Search from "esri/widgets/Search";
 import Sketch from "esri/widgets/Sketch";
 import coordinateFormatter from "esri/geometry/coordinateFormatter";
 import webMercatorUtils from "esri/geometry/support/webMercatorUtils";
-import FeatureLayer from 'esri/layers/FeatureLayer';
-import LayerView from 'esri/views/layers/LayerView';
+import {ListValue} from "../config";
 import helper from '../helper/helper';
-import Extent from 'esri/geometry/Extent';
-import Polygon from 'esri/geometry/Polygon';
 
 export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>, any> {
 
     static activeView = null;
-    
+    static allCheckedLayers = [];
+    static layers = []
+
     graphicLayerFound = new GraphicsLayer({id:"indirizzi-found-sketch",listMode:"hide",visible:true});
     graphicLayerSelected = new GraphicsLayer({id:"indirizzi-selected-sketch",listMode:"hide",visible:true});
-
     symbolFound = {
         type: "simple-fill",
         color: [51, 51, 204, 0.5],
@@ -34,6 +32,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
             width: 3
         }
     };
+
+    arrayView:ListValue[];
     constructor (props) {
       super(props)
 
@@ -60,10 +60,10 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
           geometry:null,
           typeSelected:null,
           listServices: [],
-          layersIds:[],
+          selectedCount: 0,
           searchedLayers:[]
       };
-
+      this.arrayView = Object.assign([], this.props.config.listvalues)
       this._viewLabels = this._viewLabels.bind(this);
       this._viewSelectDraw = this._viewSelectDraw.bind(this);
       this.activeViewChangeHandler = this.activeViewChangeHandler.bind(this);
@@ -77,75 +77,64 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       this.onChangeSelectLayer = this.onChangeSelectLayer.bind(this);
       this.onClickResearchfromAddress = this.onClickResearchfromAddress.bind(this);
       this.onClickResearchfromCoord = this.onClickResearchfromCoord.bind(this);
-
       this.getAllCheckedLayers = this.getAllCheckedLayers.bind(this);
 
-    }
 
-    getActiveView(){
-        return Widget.activeView;
-    }
+  }
 
-    getAllCheckedLayers(){
-        const activeView = Widget.activeView;
-        let allCheckedLayers = [];
-        if (activeView){
-            const allLayers = activeView.view.map.allLayers.items;
-            const layersIds = this.state.layersIds;
-            const listServices = this.state.listServices;
-            if (layersIds.length){
-                for (let i = 0;i < layersIds.length;i++){
-                    const currentLayerIds = layersIds[i];
-                    const serviceKey = currentLayerIds.serviceKey
-                    if (listServices.includes(serviceKey)){
-                        const layerIds = currentLayerIds.layerIds;
-                        for (let j = 0;j < allLayers.length;j++){
-                            const currentLayer = allLayers[i];
-                            if (layerIds.includes(currentLayer.id)){
-                                allCheckedLayers.push(currentLayer);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return allCheckedLayers;
-    }
-    
-    getFeatureLayer (){
-        const featureUrl = this.props.config.services.service_1.url;
-        return new FeatureLayer({url:featureUrl,outFields: ["*"]});
-    }
-    
+  
+    getActiveView = ()=>Widget.activeView;
+
+    getAllCheckedLayers =()=>Widget.allCheckedLayers;
+
     activeViewChangeHandler (jmv: JimuMapView) {
         if (jmv) {
             jmv.view.map.add(this.graphicLayerFound);
             jmv.view.map.add(this.graphicLayerSelected);
-            Widget.activeView = jmv;
-            let arraySup = [];
-            let layersIds = []
 
-            const services = this.props.config.services
-            const serviceItems = Object.keys(services);
-            serviceItems.forEach((key)=>{
+            let arraySup = [];
+            this.arrayView.forEach((el, index) => {
                 arraySup.push({
-                    label:services[key].title,
-                    value:key
+                    label:el.name,
+                    value:el
                 })
-            })
+            });
+
+            const sketch = new Sketch({
+                layer: this.graphicLayerFound,
+                view: jmv.view,
+                creationMode:"single",
+                container: "sketch-widget-address",//TODO migliorare senza id cablato
+                availableCreateTools:["polygon", "rectangle", "circle","point"],
+                visibleElements: {
+                    selectionTools:{
+                        "lasso-selection": false
+                    },
+                    settingsMenu: false
+                }
+            });
+
+            sketch.on("create", (event)=>{
+                jmv.view.graphics.removeAll();
+                this.graphicLayerFound.removeAll();
+
+                if (event.state === "complete") {
+                    const polygonGraphic = new Graphic({
+                        geometry: event.graphic.geometry,
+                        symbol: this.symbolFound
+                    });
+
+                    this.graphicLayerFound.add(polygonGraphic);
+                }
+            });
 
             const searchWidget = new Search({
                 view: jmv.view,
-                resultGraphicEnabled:true,
                 container: "search-widget-address"//TODO migliorare senza id cablato
             });
 
             searchWidget.on("select-result", (event)=>{
                 if(event && event.result && event.result.feature){
-                    // jmv.selectFeaturesByGraphic(event.result.feature,"contains").then((results)=>{
-                    //     const searchedLayers = helper.getSelectedLayerFromSearch(results);
-                    //     this.setState({searchedLayers:searchedLayers})
-                    // })
                     jmv.view.graphics.removeAll();
                     this.graphicLayerFound.removeAll();
 
@@ -172,12 +161,13 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                 this.graphicLayerFound.removeAll();
             });
 
+            Widget.activeView = jmv;
+
             this.setState({
                 arrayLayer: arraySup,
                 jimuMapView: jmv,
                 searchWidget:searchWidget,
-                layersIds:layersIds
-                // sketchWidget:sketch
+                sketchWidget:sketch
             });
         }
     }
@@ -217,19 +207,23 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
         this.setState(stateNew);
     }
-    async onChangeSelectLayer (e,n,s){
-        if(e.target.checked){
-            const copiedListServices = [...this.state.listServices,n];
-            this.setState({listServices:copiedListServices})
-        }else{
-            let index = this.state.listServices.indexOf(n);
-            if (index > -1) {
-                const copiedListServices = [...this.state.listServices];
-                copiedListServices.splice(index,1);
-                this.setState({listServices:copiedListServices})
+    onChangeSelectLayer (e,n,s){
+        const arrayId = n.listIds.split(",");
+
+        for(let i=0;i<arrayId.length;i++){
+            const id = arrayId[i];
+            const url = n.link.slice(-1) !== "/" ? n.link + "/" + id : n.link + id;
+            if(e.target.checked){
+                this.state.listServices.push(url);
+            }else{
+                let index = this.state.listServices.indexOf(url);
+                if (index > -1) {
+                    this.state.listServices.splice(index,1);
+                }
             }
         }
 
+        this.setState(this.state);
     }
     onChangeSelectTypeGeometry(e){
         // @ts-ignore
@@ -268,33 +262,49 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
 
         //parametri form
         let arrayGeometry = [];
-        let configErrors = [];
+
+        const urls = [];
+        const listServices = this.state.listServices;
+        if (listServices.length){
+            listServices.forEach((el,index)=>{
+                const currentUrl = el.substr(0,el.length-3);
+                if (urls.length){
+                    if(!urls.includes(currentUrl)){
+                        urls.push(currentUrl);
+                    }
+                }else{
+                    urls.push(currentUrl);
+                }
+            })
+        }
+
+
         //TODO PRENDERE GEOMETRIA
         this.graphicLayerFound.graphics.forEach(g=>{
-            const services = this.props.config.services;
-            const serviceKeys = Object.keys(services);
-            if (serviceKeys.length){
-                for (let i = 0;i < serviceKeys.length;i++){
-                    const currentService = services[serviceKeys[i]];
-                    const searchedLayers = this.state.searchedLayers;
-                    if (searchedLayers.length){
-                        const item = searchedLayers.find((item)=>{
-                            if (
-                                    item.featureServer === currentService.url && 
-                                    currentService.layerListIds.includes(item.id)
-                                ){
-                                    return item;
-                                }
-                        })
-                        if (Boolean(item)){
-                            //@ts-ignore
+            const searchedLayers = this.state.searchedLayers;
+            if (searchedLayers.length && urls.length){
+                searchedLayers.forEach((el:{featureServer:string,id:string}) => {
+                    if (urls.includes(el.featureServer)){
+                        const layer = this.arrayView.find((item)=>item.link === el.featureServer);
+                        const layersIds = layer ? layer.listIds : [];
+                        if (layersIds.length && layersIds.includes(el.id)){
+                            let checkedLayers = null;
+                            if (Widget.layers.length){
+                                checkedLayers = Widget.layers.find((layer)=>layer.url === el.featureServer)
+                            }
+                            if (checkedLayers){
+                                Widget.allCheckedLayers.push(checkedLayers);
+                            }
+                            // @ts-ignore
                             g.geometry = geometryEngine.buffer(g.geometry, this.state.valueBufferAddress, "meters");
                             arrayGeometry.push(g.geometry);
                         }
                     }
-                }
+                });
             }
-
+            // // @ts-ignore
+            // g.geometry = geometryEngine.buffer(g.geometry, this.state.valueBufferAddress, "meters");
+            // arrayGeometry.push(g.geometry);
         });
         //controllo errori
         let arrayErrors = [];
@@ -304,34 +314,34 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         else arrayErrors.push("Seleziona una geometria in mappa");
         if(!this.state.listServices.length) arrayErrors.push("Seleziona almeno un servizio");
         if(!this.state.typeSelected) arrayErrors.push("Seleziona una tipologia di selezione");
-        if (!arrayGeometry.length && configErrors.length > 0) arrayErrors = configErrors
 
         this.setState({
             errorMessage:arrayErrors.join()
         });
 
-        if(arrayErrors.length === 0 && this.props.config.settings.idWidgetTable !== ""){
+        if(arrayErrors.length === 0 && this.props.config.idWidgetTable !== ""){
 
+            // TODO Qui rende visibile la corrispondenza dell'indice trovato ma adesso bisogna farla sul layer inserito nel config
             this.state.jimuMapView.view.map.allLayers.forEach((f, index) =>{
                 if(f && f.type==="feature" && this.state.listServices.indexOf(index) !== -1){
                     if(f.labelingInfo?.length){
+                        console.log(f)
                         f.labelingInfo[0].symbol.font.family = "Arial";//fix font verdana not in static esri
                         f.labelsVisible = this.state.labelVisible;
                     }
                 }
             });
-            const idWidgetTable = this.props.config.settings.idWidgetTable !== " " ? this.props.config.settings.idWidgetTable :"value"
+            console.log(this.state.geometry.toJSON())
             //mando layerid ad TableList
             this.props.dispatch(
                 appActions.widgetStatePropChange(
                     "value",
                     "layerOpen",
                     {
+                        listServiceUrl:true,
                         typeSelected:this.state.typeSelected,
                         geometry:this.state.geometry.toJSON(),
                         listServices:this.state.listServices,
-                        activeView:this.getActiveView,
-                        getAllLayers:this.getAllCheckedLayers
                     }
                 )
             );
@@ -379,7 +389,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
             errorMessage:arrayErrors.join()
         });
 
-        if(arrayErrors.length === 0 && this.props.config.settings.idWidgetTable !== ""){
+        if(arrayErrors.length === 0 && this.props.config.idWidgetTable !== ""){
 
             this.state.jimuMapView.view.map.allLayers.forEach((f, index) =>{
                 if(f && f.type==="feature" && this.state.listServices.indexOf(index) !== -1){
@@ -392,9 +402,10 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
             //mando layerid ad TableList
             this.props.dispatch(
                 appActions.widgetStatePropChange(
-                    this.props.config.settings.idWidgetTable,
+                    this.props.config.idWidgetTable,
                     "layerOpen",
                     {
+                        listServiceUrl:true,
                         typeSelected:this.state.typeSelected,
                         geometry:this.state.geometry.toJSON(),
                         listServices:this.state.listServices
@@ -444,7 +455,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                             <CalciteAccordionItem icon-start="car" itemTitle="Seleziona layers da interrogare">
                                 <div className="container-fluid mt-3 mb-3">
                                     <div className="row">
-                                        <label>Layer selezionati: {this.state.listServices.length} / {this.state.arrayLayer.length}</label>
                                         <MultiSelect
                                             items={this.state.arrayLayer}
                                             onClickItem={this.onChangeSelectLayer}
@@ -560,7 +570,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                             <CalciteAccordionItem icon-start="car" itemTitle="Seleziona layers da interrogare">
                                 <div className="container-fluid mt-3 mb-3">
                                     <div className="row">
-                                        <label>Layer selezionati: {this.state.listServices.length} / {this.state.arrayLayer.length}</label>
                                         <MultiSelect
                                             items={this.state.arrayLayer}
                                             onClickItem={this.onChangeSelectLayer}
@@ -641,7 +650,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                             <CalciteAccordionItem icon-start="car" itemTitle="Seleziona layers da interrogare">
                                 <div className="container-fluid mt-3 mb-3">
                                     <div className="row">
-                                        <label>Layer selezionati: {this.state.listServices.length} / {this.state.arrayLayer.length}</label>
                                         <MultiSelect
                                             items={this.state.arrayLayer}
                                             onClickItem={this.onChangeSelectLayer}
