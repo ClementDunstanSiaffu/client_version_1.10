@@ -207,12 +207,14 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         if(event && event.result && event.result.feature){
           jmv.view.graphics.removeAll();
           this.graphicLayerFound.removeAll();
+          
   
           //@ts-ignore
-          const geometryBuffer: Polygon = geometryEngine.buffer( event.result.feature.geometry, 1, "meters");
+          const geometryBuffer: Polygon = geometryEngine.buffer( event.result.feature.geometry, 100, "meters");
           const polygonGraphic = new Graphic({geometry: geometryBuffer,symbol: this.symbolFound});
+          this.selectFeatureLayer(polygonGraphic);
           this.graphicLayerFound.add(polygonGraphic);
-          this.setState({searchByAddress:true});
+          this.setState({searchByAddress:true,disableButton:false});
         }
       });
   

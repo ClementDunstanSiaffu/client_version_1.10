@@ -59,16 +59,18 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
 
     onChangeSlider(e){
         const searchWidget = this.context?.parent;
+        const searchByAddress = this.context?.searchByAddress
         searchWidget.setState({valueBuffer: parseInt(isNaN(e) ? e.target.value: e)});
-        if (Widget.selectedResults.length){
+        if (Widget.selectedResults.length || searchByAddress){
             searchWidget.setState({disableButton:false})
         }
       }
 
     onChangeSelectTypeGeometry(e){
         const searchWidget = this.context?.parent;
+        const searchByAddress = this.context?.searchByAddress
         searchWidget.setState({typeSelected:e.target.value});
-        if (Widget.selectedResults.length){
+        if (Widget.selectedResults.length || searchByAddress){
             searchWidget.setState({disableButton:false})
         }
       }
@@ -81,11 +83,13 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
         const typeSelected = this.context?.typeSelected;
         const valueBuffer = this.context?.valueBuffer;
         const geometry = this.context?.geometry;
-        const idWidgetTable = this.context?.idWidgetTable
+        const idWidgetTable = this.context?.idWidgetTable;
+        const searchByAddress = this.context?.searchByAddress
+
 
         jimuMapView.view.map.tables.removeAll();
         let arrayErrors = [];
-        if(!checkedLayers.length) arrayErrors.push("Seleziona almeno un servizio");
+        if(!checkedLayers.length && !searchByAddress) arrayErrors.push("Seleziona almeno un servizio");
         if(!typeSelected) arrayErrors.push("Seleziona una tipologia di selezione");
         searchWidget.setState({
           errorMessage:arrayErrors.join(),
@@ -114,14 +118,17 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
             graphicsFound:searchWidget.getFoundGeometryArray
           }
 
-          const allCheckedLayers = searchWidget.getAllCheckedLayers()
+          const allCheckedLayers = !searchByAddress ? searchWidget.getAllCheckedLayers():null;
+          const currentCheckedLayers = !searchByAddress ? checkedLayers:null;
+          const currentNumberOfAttributes = !searchByAddress ? numberOfAttributes:null;
+          const isLayerChecked = !searchByAddress ? true:false
 
           const object = {
             results:results,
             allCheckedLayers:allCheckedLayers,
-            isLayerChecked:true,
-            checkedLayers:checkedLayers,
-            numberOfAttributes:numberOfAttributes,
+            isLayerChecked:isLayerChecked,
+            checkedLayers:currentCheckedLayers,
+            numberOfAttributes:currentNumberOfAttributes,
             layerOpen:layerOpen,
             createTable:true
           }

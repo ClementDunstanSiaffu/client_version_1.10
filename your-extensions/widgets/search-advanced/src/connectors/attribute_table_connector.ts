@@ -14,7 +14,7 @@ type layerOpenType = {
 
 type initObjType = {
     results:any[],
-    allCheckedLayers:any[],
+    allCheckedLayers?:any[],
     isLayerChecked?:boolean,
     checkedLayers?:string[],
     numberOfAttributes?:{[key:string]:string},
@@ -29,7 +29,7 @@ class AttributeTableConnector {
     static activeView:JimuMapView = null;
     static self:any = null;
 
-    allCheckedLayers:any[];
+    allCheckedLayers?:any[];
     checkedLayers?:string[];
     numberOfAttributes?:{[key:string]:string};
     createTable:boolean;
@@ -68,8 +68,9 @@ class AttributeTableConnector {
         }
         this.createTable = createTable;
         this.isLayerChecked = isLayerChecked;
+        this.setAllCheckedLayers(allCheckedLayers,results);
         this.setCheckedLayers(allCheckedLayers,checkedLayers);
-        this.setAllCheckedLayers(allCheckedLayers);
+        // this.setAllCheckedLayers(allCheckedLayers);
         this.setNumberOfAttributes(results,numberOfAttributes);
         this.setLayerOpen(layerOpen);
     }
@@ -91,7 +92,13 @@ class AttributeTableConnector {
         return idsArray;
     }
 
-    setCheckedLayers = (allCheckedLayers:any,checkedLayers?:string[],)=>{
+
+
+    setCheckedLayers = (currentAllChechedLayers:any,checkedLayers?:string[],)=>{
+        let allCheckedLayers = currentAllChechedLayers;
+        if (!allCheckedLayers){
+            allCheckedLayers = this.allCheckedLayers;
+        }
         if (checkedLayers){
             this.checkedLayers = checkedLayers;
             return;
@@ -117,13 +124,33 @@ class AttributeTableConnector {
         }
     }
 
-    setAllCheckedLayers = (allCheckedLayers:any)=>{
-        if (this.isObject(allCheckedLayers)){
-            this.allCheckedLayers = [allCheckedLayers]
+    setAllCheckedLayersFromResults = (results:any[])=>{
+        if (results?.length > 0){
+            const allCheckedLayers = results.reduce((newArray,items:any[])=>{
+                if (items?.length > 0){
+                    newArray.push(items[0]?.layer)
+                }
+                return newArray;
+            },[])
+            this.allCheckedLayers = allCheckedLayers;
+            return;
         }
-        if (this.isArray(allCheckedLayers)){
-            this.allCheckedLayers = allCheckedLayers
+        throw "Pass results after query"
+
+    }
+
+    setAllCheckedLayers = (allCheckedLayers:any,results:any[])=>{
+        if (allCheckedLayers){
+            if (this.isObject(allCheckedLayers)){
+                this.allCheckedLayers = [allCheckedLayers]
+            }
+            if (this.isArray(allCheckedLayers)){
+                this.allCheckedLayers = allCheckedLayers
+            }
+            return;
         }
+        this.setAllCheckedLayersFromResults(results);
+ 
     }
 
 
