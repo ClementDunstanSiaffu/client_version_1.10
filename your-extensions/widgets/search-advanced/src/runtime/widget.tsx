@@ -79,7 +79,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       searchByAddress:false,
       disableButton:true,
       urlFetched:{"comuni":false,"sito":false,"ambito":false},
-      locatingPosition:{"status":false,"error":false}
+      locatingPosition:{"status":false,"error":false},
+      searchedLayerIds:[]
     }
 
     this.activeViewChangeHandler = this.activeViewChangeHandler.bind(this);
@@ -152,7 +153,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
             if (results?.length){
               helper.unhighlightLayer();
               Widget.selectedResults = results;
-              this.setState({disableButton:false})
+              const searchedLayerIds = helper.getLayersFromSearchResults(results);
+              this.setState({disableButton:false,searchedLayerIds:searchedLayerIds})
             }else{
               this.setState({errorMessage:"No item was selected"})
             }

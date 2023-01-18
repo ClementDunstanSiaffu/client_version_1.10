@@ -84,17 +84,29 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
         const valueBuffer = this.context?.valueBuffer;
         const geometry = this.context?.geometry;
         const idWidgetTable = this.context?.idWidgetTable;
-        const searchByAddress = this.context?.searchByAddress
-
+        const searchByAddress = this.context?.searchByAddress;
+        const searchedLayerIds = this.context?.searchedLayerIds;
 
         jimuMapView.view.map.tables.removeAll();
         let arrayErrors = [];
-        if(!checkedLayers.length && !searchByAddress) arrayErrors.push("Seleziona almeno un servizio");
+        if(!checkedLayers.length) arrayErrors.push("Seleziona almeno un servizio");
         if(!typeSelected) arrayErrors.push("Seleziona una tipologia di selezione");
         searchWidget.setState({
           errorMessage:arrayErrors.join(),
           disableButton:true
         });
+        
+        if(arrayErrors.length === 0){
+          const foundInSearchAdress = [];
+          for (let i = 0;i < checkedLayers.length;i++){
+            const currentChechedId = checkedLayers[i];
+            if (searchedLayerIds.includes(currentChechedId))foundInSearchAdress.push(currentChechedId);
+          }
+          if (!foundInSearchAdress.length){
+            arrayErrors.push("Checked layers was no found on searched address")
+          }
+        }
+
         Widget.foundGeometry = searchWidget.graphicLayerFound;
     
         if(arrayErrors.length === 0 && idWidgetTable !== ""){
@@ -118,20 +130,31 @@ export default class IndrizzoTab extends React.PureComponent<any,any>{
             graphicsFound:searchWidget.getFoundGeometryArray
           }
 
-          const allCheckedLayers = !searchByAddress ? searchWidget.getAllCheckedLayers():null;
-          const currentCheckedLayers = !searchByAddress ? checkedLayers:null;
-          const currentNumberOfAttributes = !searchByAddress ? numberOfAttributes:null;
-          const isLayerChecked = !searchByAddress ? true:false
-
           const object = {
             results:results,
-            allCheckedLayers:allCheckedLayers,
-            isLayerChecked:isLayerChecked,
-            checkedLayers:currentCheckedLayers,
-            numberOfAttributes:currentNumberOfAttributes,
+            allCheckedLayers:searchWidget.getAllCheckedLayers(),
+            isLayerChecked:true,
+            checkedLayers:checkedLayers,
+            numberOfAttributes:numberOfAttributes,
             layerOpen:layerOpen,
             createTable:true
           }
+
+
+          // const allCheckedLayers = !searchByAddress ? searchWidget.getAllCheckedLayers():null;
+          // const currentCheckedLayers = !searchByAddress ? checkedLayers:null;
+          // const currentNumberOfAttributes = !searchByAddress ? numberOfAttributes:null;
+          // const isLayerChecked = !searchByAddress ? true:false
+
+          // const object = {
+          //   results:results,
+          //   allCheckedLayers:allCheckedLayers,
+          //   isLayerChecked:isLayerChecked,
+          //   checkedLayers:currentCheckedLayers,
+          //   numberOfAttributes:currentNumberOfAttributes,
+          //   layerOpen:layerOpen,
+          //   createTable:true
+          // }
 
           Widget.attributeConnector.init(object);
           try{

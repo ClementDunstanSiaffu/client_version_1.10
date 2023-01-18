@@ -118,6 +118,21 @@ class Helper{
         } 
     }
 
+    getLayersFromSearchResults = (results:any[]):string[]=>{
+        let layerIdFromSearch = [];
+        if (results?.length > 0){
+            const allCheckedLayers = results.reduce((newArray,items:any[])=>{
+                if (items?.length > 0){
+                    newArray.push(items[0]?.layer.id)
+                }
+                return newArray;
+            },[])
+            layerIdFromSearch = allCheckedLayers;
+        }
+        return layerIdFromSearch;
+
+    }
+
     returnGraphicsGeometry = (feature)=>{
         let latitude,longitude,polygon;
         const geometry = feature?.geometry;
